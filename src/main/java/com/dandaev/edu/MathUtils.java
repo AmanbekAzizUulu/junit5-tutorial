@@ -5,5 +5,8 @@ public class MathUtils {
 		return a + b;
 	}
 
+	public int subtractor(int a, int b){
+		return a - b;
+	}
 
 }
