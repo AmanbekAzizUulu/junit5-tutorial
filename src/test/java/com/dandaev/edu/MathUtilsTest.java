@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 
-import javax.management.RuntimeErrorException;
-
 import org.junit.jupiter.api.Test;
 
 public class MathUtilsTest {
@@ -46,5 +44,12 @@ public class MathUtilsTest {
 	@Test
 	void testingSubtractorMethod(){
 		assertEquals(new MathUtils().subtractor(3, 2), 1, "the result of subtraction should be 1");
+	}
+
+	@Test
+	void testingComputationOfCircleArea() {
+		var mathUtils = new MathUtils();
+
+		assertEquals(314.1592653589793, mathUtils.circleArea(10));
 	}
 }
