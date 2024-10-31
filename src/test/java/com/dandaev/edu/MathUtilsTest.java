@@ -10,7 +10,6 @@ public class MathUtilsTest {
 
 	@Test
 	void testingArraysEquality() {
-
 		// int[] array_1 = new int[] { 0, 1, 2, 3, 4 };
 		// int[] array_2 = new int[] { 4, 3, 2, 1, 0 };
 
@@ -48,8 +47,6 @@ public class MathUtilsTest {
 
 	@Test
 	void testingComputationOfCircleArea() {
-		var mathUtils = new MathUtils();
-
-		assertEquals(314.1592653589793, mathUtils.circleArea(10));
+		assertEquals(new MathUtils().circleArea(10), 314.1592653589793);
 	}
 }

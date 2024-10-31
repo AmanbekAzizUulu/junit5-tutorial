@@ -36,6 +36,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<version>3.5.1</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<!-- Билд настройки -->
@@ -51,6 +59,13 @@
 					<target>${maven.compiler.target}</target>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.5.1</version>				<!-- Use the latest stable version -->
+			</plugin>
+
 		</plugins>
 	</build>
 </project>
