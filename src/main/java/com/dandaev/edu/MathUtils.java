@@ -15,4 +15,9 @@ public class MathUtils {
 		return radius * radius * PI;
 	}
 
+	public int divider(int a, int b) {
+		return a / b;
+	}
+
+
 }

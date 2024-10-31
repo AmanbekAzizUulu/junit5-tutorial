@@ -363,3 +363,332 @@ You can further customize the Surefire Plugin with additional configuration opti
 ### Conclusion
 
 The Maven Surefire Plugin is an essential tool for running tests in Maven projects. By integrating it into your `pom.xml`, you can easily manage and run your unit tests, ensuring that your code remains reliable and bug-free throughout development.
+
+---
+
+The `assertThrows` method in JUnit is used to test that a specific exception is thrown during the execution of a particular block of code. This is particularly useful when you want to verify that your code correctly handles exceptional cases. Here’s how it works:
+
+### Syntax
+
+The basic syntax for `assertThrows` is as follows:
+
+```java
+<T extends Throwable> T assertThrows(Class<T> expectedType, Executable executable);
+```
+
+- `expectedType`: The class of the exception you expect to be thrown.
+- `executable`: A functional interface (usually a lambda expression or method reference) that represents the code you want to execute.
+
+### Example Usage
+
+Here’s an example that demonstrates how to use `assertThrows` to test for an exception:
+
+#### 1. **Creating a Class to Test**
+
+Let's create a simple class that throws an `IllegalArgumentException` if a negative number is passed to the `setAge` method:
+
+```java
+package com.example;
+
+public class Person {
+    private int age;
+
+    public void setAge(int age) {
+        if (age < 0) {
+            throw new IllegalArgumentException("Age cannot be negative");
+        }
+        this.age = age;
+    }
+
+    public int getAge() {
+        return age;
+    }
+}
+```
+
+#### 2. **Writing a Test Class**
+
+Now, let's write a test class that uses `assertThrows` to verify that an `IllegalArgumentException` is thrown when we attempt to set a negative age:
+
+```java
+package com.example;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+public class PersonTest {
+
+    @Test
+    public void testSetAgeThrowsExceptionForNegativeValue() {
+        Person person = new Person();
+
+        // Use assertThrows to verify that an IllegalArgumentException is thrown
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> person.setAge(-1), // Executable code block
+            "Expected setAge(-1) to throw, but it didn't"
+        );
+
+        // Optionally, you can verify the exception message
+        assertEquals("Age cannot be negative", thrown.getMessage());
+    }
+}
+```
+
+### How It Works
+
+1. **Creating the Executable**: The `executable` parameter is defined as a lambda expression `() -> person.setAge(-1)`, which means when executed, it will call the `setAge` method with `-1`.
+
+2. **Executing the Code**: JUnit runs the code within the `assertThrows` method. If the specified exception (`IllegalArgumentException` in this case) is thrown, the test passes.
+
+3. **Handling the Exception**: If the expected exception is thrown, `assertThrows` returns the exception instance, which can be further inspected if needed (e.g., checking the message).
+
+4. **Failing the Test**: If the code does not throw the expected exception, the test fails, indicating that the method did not behave as expected.
+
+### Summary
+
+The `assertThrows` method is a powerful tool in JUnit for verifying that specific exceptions are thrown during method execution, allowing for robust testing of error handling in your code.
+
+---
+
+The English translation for "делитель, функция которая делит" is "divider, a function that divides." If you're looking for an example of a division function in Java, here's how you could implement it:
+
+### Example of a Divider Function in Java
+
+```java
+package com.example;
+
+public class MathUtils {
+    public double divider(double a, double b) {
+        if (b == 0) {
+            throw new IllegalArgumentException("Divider cannot be zero");
+        }
+        return a / b;
+    }
+}
+```
+
+### Explanation
+
+1. **Function Definition**: The `divider` function takes two parameters: `a` (the dividend) and `b` (the divisor).
+2. **Error Handling**: Before performing the division, the function checks if `b` is zero. If it is, an `IllegalArgumentException` is thrown to prevent division by zero.
+3. **Return Value**: If `b` is not zero, the function returns the result of `a / b`.
+
+### Example of a Test for the Divider Function
+
+To ensure that the `divider` function works as intended, you can write a test case using JUnit:
+
+```java
+package com.example;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class MathUtilsTest {
+
+    @Test
+    public void testDivider() {
+        MathUtils mathUtils = new MathUtils();
+
+        assertEquals(2.0, mathUtils.divider(4.0, 2.0), "4.0 divided by 2.0 should be 2.0");
+    }
+
+    @Test
+    public void testDividerThrowsExceptionWhenDividingByZero() {
+        MathUtils mathUtils = new MathUtils();
+
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> mathUtils.divider(4.0, 0),
+            "Expected divider(4.0, 0) to throw, but it didn't"
+        );
+
+        assertEquals("Divider cannot be zero", thrown.getMessage());
+    }
+}
+```
+
+### Summary
+
+This example illustrates how to implement a simple division function in Java, complete with error handling for division by zero, and how to write tests to verify its correctness.
+
+---
+
+In the context of Java and particularly JUnit testing, an **`Executable`** is a functional interface that represents a block of code that can be executed. It was introduced in JUnit 5 to provide a way to encapsulate code that is expected to throw exceptions, especially during testing.
+
+### Characteristics of `Executable`
+
+1. **Functional Interface**: `Executable` is a functional interface, which means it can be represented as a lambda expression or method reference. It has a single abstract method:
+   ```java
+   void execute() throws Throwable;
+   ```
+
+2. **Exception Handling**: The `execute` method can throw any type of exception, allowing the use of `Executable` in scenarios where you need to assert that a particular piece of code throws an expected exception.
+
+3. **Usage**: The primary use case for `Executable` is in assertions that validate that an exception is thrown under certain conditions, which makes it easier to write cleaner and more readable test code.
+
+### Example Usage of `Executable`
+
+Here's how you can use `Executable` in a JUnit test to assert that a specific method throws an exception:
+
+```java
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class MathUtilsTest {
+
+    @Test
+    public void testDividerThrowsExceptionWhenDividingByZero() {
+        MathUtils mathUtils = new MathUtils();
+
+        Executable executable = () -> mathUtils.divider(4.0, 0);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Divider cannot be zero", exception.getMessage());
+    }
+}
+```
+
+### Explanation
+
+- In the example above, we define an `Executable` using a lambda expression that calls the `divider` method with a zero divisor.
+- The `assertThrows` method is used to execute the `Executable` and assert that an `IllegalArgumentException` is thrown.
+- This pattern enhances code readability and separates the logic of the test from the assertion.
+
+### Summary
+
+In summary, `Executable` is a useful construct in JUnit 5 that allows you to encapsulate a block of code, making it easier to assert that certain exceptions are thrown during testing. It improves code clarity and helps in handling exceptions in a more structured way during unit tests.
+
+---
+
+In JUnit 4 and earlier versions of JUnit, the common way to assert that a method throws an exception was to use the `@Test(expected = Exception.class)` annotation. This approach is straightforward but does not allow for custom error messages or capturing the exception object for further assertions.
+
+### Example of JUnit 4 Style
+
+Here's how you would write a test for a method that divides two numbers and check that it throws an `ArithmeticException` when dividing by zero using JUnit 4:
+
+```java
+import org.junit.Test;
+
+public class MathUtilsTest {
+
+    @Test(expected = ArithmeticException.class)
+    public void testingDividerMethod() {
+        new MathUtils().divider(10, 0); // This should throw ArithmeticException
+    }
+}
+```
+
+### Explanation
+
+- **Annotation**: The `@Test(expected = ArithmeticException.class)` annotation specifies that the test is expected to throw an `ArithmeticException`. If this exception is thrown, the test passes; if it is not thrown, the test fails.
+- **No Lambda**: This approach does not use a lambda expression. The code inside the test method directly invokes the method that is expected to throw the exception.
+
+### Example of JUnit 5 Style Without Lambda
+
+If you want to achieve similar functionality in JUnit 5 without using a lambda, you can create a separate `Executable` instance like this:
+
+```java
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+public class MathUtilsTest {
+
+    @Test
+    void testingDividerMethod() {
+        // Create an Executable without using a lambda
+        Executable executable = new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                new MathUtils().divider(10, 0);
+            }
+        };
+
+        // Assert that the ArithmeticException is thrown
+        assertThrows(ArithmeticException.class, executable, "divide by zero should throw ArithmeticException");
+    }
+}
+```
+
+### Summary
+
+- In JUnit 4, the `@Test(expected = ...)` annotation was commonly used to check for exceptions.
+- In JUnit 5, you can use an `Executable` implementation to avoid lambda expressions if needed, although using lambdas is more concise and idiomatic in modern Java code.
+- The choice between JUnit 4 and JUnit 5 is often based on project requirements and the need for more advanced testing features that JUnit 5 provides.
+
+---
+
+In Java, dividing by zero using floating-point numbers (like `double`) does not throw an exception. Instead, it returns `Infinity` or `-Infinity`, depending on the sign of the numerator. An `ArithmeticException` is only thrown for integer division when dividing by zero.
+
+### Solution
+
+To address this issue, you need to explicitly handle the case of division by zero in your `divider` method and throw an `ArithmeticException` yourself. Here’s how you can modify your `divider` method:
+
+```java
+public double divider(double a, double b) {
+    if (b == 0) {
+        throw new ArithmeticException("Division by zero is not allowed.");
+    }
+    return a / b;
+}
+```
+
+### Updated MathUtils Class
+
+Here is the updated `MathUtils` class with the proper exception handling:
+
+```java
+package com.dandaev.edu;
+
+public class MathUtils {
+    private static final double PI = Math.PI;
+
+    public int adder(int a, int b) {
+        return a + b;
+    }
+
+    public int subtractor(int a, int b) {
+        return a - b;
+    }
+
+    public double circleArea(double radius) {
+        return radius * radius * PI;
+    }
+
+    public double divider(double a, double b) {
+        if (b == 0) {
+            throw new ArithmeticException("Division by zero is not allowed.");
+        }
+        return a / b;
+    }
+}
+```
+
+### JUnit Test Method
+
+Your JUnit test method remains the same, as it correctly checks for the `ArithmeticException` when dividing by zero:
+
+```java
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+public class MathUtilsTest {
+
+    @Test
+    void testingDividerMethod() {
+        assertThrows(ArithmeticException.class, () -> new MathUtils().divider(10, 0), "divide by zero should throw ArithmeticException");
+    }
+}
+```
+
+### Summary
+
+1. **Update the `divider` Method**: Ensure that the `divider` method checks for division by zero and throws an `ArithmeticException` if the divisor is zero.
+2. **Retain Your Test**: Your JUnit test will correctly pass now, as it is designed to expect an `ArithmeticException` when attempting to divide by zero.
+
+After making these changes, running your tests should result in the test passing as expected.

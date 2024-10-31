@@ -49,4 +49,13 @@ public class MathUtilsTest {
 	void testingComputationOfCircleArea() {
 		assertEquals(new MathUtils().circleArea(10), 314.1592653589793);
 	}
+
+	@Test
+	void testingDividerMethod(){
+		// если будет выброшен  ArithmeticException, тест будет пройден успешно
+		assertThrows(ArithmeticException.class, () -> new MathUtils().divider(10, 0), "divide by zero should throw ArithmeticException");
+
+		// если же не будет выброшен  ArithmeticException, или будет выброшен Exception отличный от ArithmeticException, тест будет пройден нуспешно
+		// assertThrows(ArithmeticException.class, () -> new MathUtils().divider(10, 2), "divide by zero should throw ArithmeticException");
+	}
 }
