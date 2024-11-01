@@ -692,3 +692,446 @@ public class MathUtilsTest {
 2. **Retain Your Test**: Your JUnit test will correctly pass now, as it is designed to expect an `ArithmeticException` when attempting to divide by zero.
 
 After making these changes, running your tests should result in the test passing as expected.
+
+---
+
+The **testing lifecycle** in JUnit defines the sequence in which various annotations and methods are executed before, during, and after each test, ensuring that necessary setup and cleanup are performed. This lifecycle enables a controlled environment for each test, maintaining independence and reliability across different test cases.
+
+### Key Annotations and Phases in the JUnit Testing Lifecycle
+
+1. **@BeforeAll**:
+   - A method annotated with `@BeforeAll` runs once before any test methods in the class.
+   - This is typically used for initializing resources that are shared across all tests, such as establishing a database connection.
+   - The method must be static.
+
+2. **@BeforeEach**:
+   - A method annotated with `@BeforeEach` runs before each test method.
+   - Used for setting up test-specific configurations or initializing objects to ensure a consistent state for every test.
+
+3. **@Test**:
+   - The main test method, marked with `@Test`, contains the code to execute and verify the functionality of a unit of code.
+   - A test can be skipped with `@Disabled`, if necessary, to temporarily bypass certain tests.
+
+4. **@AfterEach**:
+   - A method annotated with `@AfterEach` runs after each test method.
+   - It’s used for cleaning up or resetting resources specific to each test, such as closing a file or rolling back a transaction.
+
+5. **@AfterAll**:
+   - A method annotated with `@AfterAll` runs once after all test methods have been executed.
+   - This is used to clean up shared resources initialized in `@BeforeAll`, like closing a database connection.
+   - The method must also be static.
+
+### Example of JUnit Testing Lifecycle
+
+Below is an example demonstrating how these annotations work together in a simple test class:
+
+```java
+import org.junit.jupiter.api.*;
+
+class MathUtilsTest {
+
+    @BeforeAll
+    static void setupAll() {
+        System.out.println("Initializing resources before all tests.");
+        // Code to initialize shared resources (e.g., database connection)
+    }
+
+    @BeforeEach
+    void setupEach() {
+        System.out.println("Setting up before each test.");
+        // Code to set up preconditions for each test
+    }
+
+    @Test
+    void testAddition() {
+        System.out.println("Running testAddition");
+        // Test logic and assertions
+        Assertions.assertEquals(2, 1 + 1);
+    }
+
+    @Test
+    void testSubtraction() {
+        System.out.println("Running testSubtraction");
+        // Test logic and assertions
+        Assertions.assertEquals(0, 1 - 1);
+    }
+
+    @AfterEach
+    void tearDownEach() {
+        System.out.println("Cleaning up after each test.");
+        // Code to release resources specific to each test
+    }
+
+    @AfterAll
+    static void tearDownAll() {
+        System.out.println("Releasing resources after all tests.");
+        // Code to release shared resources
+    }
+}
+```
+
+### Output for This Example
+
+Running this test class will produce output showing the sequence of lifecycle method calls, like:
+
+```plaintext
+Initializing resources before all tests.
+Setting up before each test.
+Running testAddition
+Cleaning up after each test.
+Setting up before each test.
+Running testSubtraction
+Cleaning up after each test.
+Releasing resources after all tests.
+```
+
+Each phase in the lifecycle supports **test independence** and **resource management**. For example, using `@BeforeEach` and `@AfterEach` ensures each test starts fresh and doesn’t interfere with other tests, improving test reliability.
+
+---
+
+Если в классе с тестами JUnit создать **переменную объекта** (т.е. не `static`) и изменять её в разных методах тестирования, то это может привести к непредсказуемым результатам и ошибкам при выполнении тестов. Вот почему:
+
+### Особенности выполнения тестов JUnit
+
+1. **JUnit создаёт новый экземпляр класса теста для каждого метода**.
+   - Это значит, что каждый метод теста выполняется в **отдельном экземпляре** класса теста.
+   - Поэтому любые изменения в переменной объекта, сделанные в одном методе, **не сохранятся** в других методах. Каждый тест будет работать со своей копией переменной.
+
+2. **Изменения не будут передаваться между тестами**.
+   - Из-за того, что каждый метод теста получает новый экземпляр тестового класса, значение переменной объекта **сбрасывается** в каждом методе.
+   - Поэтому, если вы пытаетесь изменять переменную объекта и полагаться на её измененное значение в следующем тесте, это не сработает.
+
+### Пример
+
+Рассмотрим пример с переменной объекта `counter`, которую изменяем в нескольких тестах:
+
+```java
+public class MathUtilsTest {
+
+    private int counter = 0; // Переменная объекта
+
+    @Test
+    public void testIncrementCounter() {
+        counter++;
+        System.out.println("Counter in testIncrementCounter: " + counter); // Выведет 1
+    }
+
+    @Test
+    public void testCounterValue() {
+        System.out.println("Counter in testCounterValue: " + counter); // Выведет 0, т.к. это новый экземпляр
+    }
+}
+```
+
+В этом случае:
+- Первый тест `testIncrementCounter` увеличит `counter` до 1, но этот результат **не повлияет** на переменную `counter` во втором тесте.
+- Во втором тесте `testCounterValue`, значение `counter` снова будет равно 0, так как это новый экземпляр класса `MathUtilsTest`.
+
+### Рекомендация
+Если требуется использовать общую переменную для всех тестов и отслеживать её состояние, можно:
+1. Сделать переменную `static` — тогда она будет общей для всех экземпляров и сохранит изменения между тестами. Однако это также требует осторожности, так как изменения могут вызвать побочные эффекты.
+2. Использовать аннотации `@BeforeEach` и `@AfterEach`, чтобы инициализировать переменную перед каждым тестом и очищать после него, если важно, чтобы каждый тест начинал с определенного состояния.
+
+---
+
+`@BeforeAll` — это аннотация в JUnit 5, которая указывает, что метод должен быть выполнен **один раз перед всеми тестами в классе**. Этот метод запускается перед запуском всех тестов и подходит для действий, которые нужно сделать только один раз для всех тестов (например, настройка ресурсоёмких операций).
+
+### Основные особенности `@BeforeAll`
+
+1. **Выполнение только один раз**:
+   - Метод, аннотированный `@BeforeAll`, запускается единожды перед всеми тестами, а не перед каждым тестом отдельно.
+   - Это полезно, если нужно провести подготовку, которая будет актуальна для всех тестов.
+
+2. **Требует `static` метода**:
+   - Метод, помеченный `@BeforeAll`, должен быть `static`, так как он должен вызываться до создания экземпляра класса теста.
+   - Если метод не `static`, JUnit выбросит ошибку, и тесты не будут запущены.
+
+3. **Типичные сценарии использования**:
+   - Настройка базы данных или подключение к ней, если требуется только одно подключение для всех тестов.
+   - Загрузка больших наборов данных или конфигураций, которые будут использоваться несколькими тестами.
+   - Инициализация ресурсов, которые требуют много времени для создания и должны быть общими для всех тестов.
+
+### Пример использования `@BeforeAll`
+
+```java
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+public class DatabaseTest {
+
+    private static DatabaseConnection connection;
+
+    @BeforeAll
+    static void setup() {
+        System.out.println("Setting up the database connection...");
+        connection = new DatabaseConnection();
+        connection.connect();  // Подключаемся к базе данных только один раз
+    }
+
+    @Test
+    void testDatabaseQuery1() {
+        System.out.println("Executing testDatabaseQuery1");
+        // Выполнение теста с использованием connection
+    }
+
+    @Test
+    void testDatabaseQuery2() {
+        System.out.println("Executing testDatabaseQuery2");
+        // Выполнение другого теста с использованием connection
+    }
+}
+```
+
+В этом примере:
+- `@BeforeAll` используется для создания соединения с базой данных, которое применяется ко всем тестам в классе.
+- Тесты `testDatabaseQuery1` и `testDatabaseQuery2` используют это подключение.
+
+### Важно помнить
+
+- Методы `@BeforeAll` не могут зависеть от экземпляров класса, поскольку они выполняются до создания любых объектов.
+- Если требуется выполнить действия после завершения всех тестов, можно использовать `@AfterAll` — аналогичную аннотацию, но для очистки ресурсов после всех тестов.
+
+Использование `@BeforeAll` помогает сделать тесты более эффективными, избегая дублирования операций настройки и экономя время на подготовке перед каждым тестом.
+
+---
+
+Аннотация `@AfterAll` в JUnit 5 используется для обозначения метода, который должен выполняться **один раз после завершения всех тестов** в тестовом классе. Этот метод обычно служит для освобождения ресурсов или выполнения других действий по очистке, которые нужно выполнить после всех тестов.
+
+### Основные особенности `@AfterAll`
+
+1. **Запуск один раз после всех тестов**:
+   - Метод, аннотированный `@AfterAll`, выполняется только один раз, после завершения всех тестов в классе, а не после каждого теста.
+   - Он часто используется для закрытия соединений или освобождения ресурсов, которые были созданы в методе, помеченном аннотацией `@BeforeAll`.
+
+2. **Требует `static` метода**:
+   - Метод `@AfterAll` должен быть `static`, поскольку он выполняется на уровне класса и вызывается после выполнения всех тестов.
+   - Если метод не является `static`, JUnit выдаст ошибку, и тесты не будут запущены.
+
+3. **Типичные сценарии использования**:
+   - Закрытие соединений с базой данных, файлов или сетевых соединений.
+   - Удаление временных файлов или данных, которые были созданы в процессе тестирования.
+   - Очистка ресурсов, которые могут занимать память, если их не удалить вручную.
+
+### Пример использования `@AfterAll`
+
+```java
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+public class ResourceTest {
+
+    private static DatabaseConnection connection;
+
+    @BeforeAll
+    static void setup() {
+        System.out.println("Setting up the database connection...");
+        connection = new DatabaseConnection();
+        connection.connect(); // Подключаемся к базе данных перед тестами
+    }
+
+    @Test
+    void testDatabaseQuery1() {
+        System.out.println("Executing testDatabaseQuery1");
+        // Выполнение теста с использованием connection
+    }
+
+    @Test
+    void testDatabaseQuery2() {
+        System.out.println("Executing testDatabaseQuery2");
+        // Выполнение другого теста с использованием connection
+    }
+
+    @AfterAll
+    static void cleanup() {
+        System.out.println("Cleaning up resources...");
+        if (connection != null) {
+            connection.disconnect(); // Закрытие подключения к базе данных
+        }
+    }
+}
+```
+
+В этом примере:
+- Метод `@BeforeAll` используется для установки подключения к базе данных, которое будет использоваться во всех тестах.
+- После выполнения всех тестов метод `@AfterAll` закрывает соединение, освобождая ресурсы.
+
+### Важные моменты
+
+- **Синхронизация**: Если у вас несколько тестовых классов, содержащих методы `@AfterAll`, каждый класс будет запускать свои методы `@AfterAll` отдельно, после выполнения всех тестов в этом классе.
+- **Статический контекст**: Поскольку `@AfterAll` требует `static`, он может использовать только статические переменные и методы.
+- **Логирование и очистка**: `@AfterAll` часто используется для логирования и гарантирует, что тесты не оставят за собой "следов" (например, открытых подключений, незакрытых потоков и файлов).
+
+### Связь с аннотацией `@BeforeAll`
+
+Аннотации `@BeforeAll` и `@AfterAll` часто используются вместе: первая — для настройки ресурсов перед началом тестов, вторая — для их очистки после всех тестов.
+
+---
+
+Аннотация `@BeforeEach` в JUnit 5 используется для обозначения метода, который должен выполняться **перед каждым тестовым методом** в тестовом классе. Это значит, что для каждого теста вызывается метод, помеченный этой аннотацией, обеспечивая подготовку необходимых ресурсов или начальное состояние перед выполнением каждого теста.
+
+### Основные особенности `@BeforeEach`
+
+1. **Выполнение перед каждым тестом**:
+   - Метод, аннотированный `@BeforeEach`, запускается перед каждым тестовым методом в классе.
+   - Это полезно, когда нужно гарантировать, что каждый тест запускается с чистым, предсказуемым состоянием.
+
+2. **Инициализация состояния для каждого теста**:
+   - Аннотация помогает избежать влияния одного теста на другой, так как каждый тестовый метод начинается с одинаковых условий.
+   - `@BeforeEach` часто используется для установки переменных, объектов или начальных значений, которые будут использоваться только в пределах одного теста.
+
+3. **Может быть не `static`**:
+   - В отличие от `@BeforeAll`, `@BeforeEach` может (и обычно должен) быть **нестатическим**. Это позволяет использовать экземплярные переменные и состояния, которые уникальны для каждого теста.
+
+4. **Применение с аннотацией `@AfterEach`**:
+   - Часто используется вместе с `@AfterEach`, которая выполняет очистку после каждого теста, гарантируя, что каждый тест заканчивается со сброшенным состоянием.
+
+### Пример использования `@BeforeEach`
+
+```java
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ListTest {
+
+    private List<String> list;
+
+    @BeforeEach
+    void setup() {
+        list = new ArrayList<>();
+        list.add("Initial element"); // Заполнение начальным значением
+        System.out.println("List initialized before each test.");
+    }
+
+    @Test
+    void testListAddition() {
+        list.add("New element");
+        System.out.println("Running testListAddition");
+        // Проверка, что элемент добавлен
+        assertEquals(2, list.size());
+    }
+
+    @Test
+    void testListClear() {
+        list.clear();
+        System.out.println("Running testListClear");
+        // Проверка, что список очищен
+        assertEquals(0, list.size());
+    }
+}
+```
+
+В этом примере:
+- Метод `setup()` помечен `@BeforeEach`, и он инициализирует `list` и добавляет в него элемент.
+- Каждый тест запускается с новым экземпляром `list`, в котором уже есть один элемент ("Initial element").
+- Каждый метод теста работает с отдельной копией `list`, предотвращая влияние одного теста на другой.
+
+### Типичные сценарии использования `@BeforeEach`
+
+- **Подготовка данных**: Например, заполнение списка, создание временных файлов или объектов, настройка начальных значений.
+- **Установка начального состояния**: Метод `@BeforeEach` гарантирует, что перед каждым тестом состояние является предсказуемым.
+- **Инициализация зависимостей**: Создание мок-объектов или других зависимостей, которые нужны только на время выполнения одного теста.
+
+### Важные моменты
+
+- **Локальные изменения**: Так как `@BeforeEach` вызывается перед каждым тестом, все изменения в объекте, созданном в `@BeforeEach`, остаются локальными для этого теста.
+- **Изоляция тестов**: Использование `@BeforeEach` помогает изолировать тесты друг от друга, обеспечивая, что изменения, сделанные одним тестом, не повлияют на другие.
+- **Удобство при отладке**: С `@BeforeEach` легче отлаживать каждый тест отдельно, поскольку он всегда начинается с известного состояния.
+
+### Связь с аннотацией `@BeforeAll`
+
+- `@BeforeEach` подготавливает окружение перед каждым тестом, а `@BeforeAll` — один раз перед всеми тестами.
+- `@BeforeAll` обычно используется для инициализации тяжелых ресурсов (например, соединений с базой данных), а `@BeforeEach` — для легких объектов или данных, которые специфичны для каждого теста.
+
+---
+
+Аннотация `@AfterEach` в JUnit 5 используется для обозначения метода, который должен выполняться **после каждого тестового метода** в тестовом классе. Этот метод выполняет задачи по очистке или сбросу состояния, чтобы подготовить тестовое окружение для следующего теста. `@AfterEach` помогает предотвратить нежелательное влияние одного теста на другой, обеспечивая изоляцию тестов и единообразное начальное состояние.
+
+### Основные особенности `@AfterEach`
+
+1. **Выполнение после каждого теста**:
+   - Метод с `@AfterEach` запускается после каждого тестового метода в классе.
+   - Это полезно для сброса изменений, которые тест мог внести в общие ресурсы или переменные, тем самым защищая следующее выполнение от воздействия предыдущего.
+
+2. **Изоляция тестов**:
+   - При правильной настройке `@AfterEach` можно быть уверенным, что каждый тест работает с "чистым" состоянием, поскольку изменения, сделанные в одном тесте, сбрасываются после его завершения.
+   - Метод предотвращает накопление изменений, которое может привести к неправильным результатам, особенно если несколько тестов работают с одними и теми же объектами или ресурсами.
+
+3. **Может быть не `static`**:
+   - В отличие от аннотации `@AfterAll`, которая требует статического метода, `@AfterEach` обычно применяется к нестатическим методам, так как он имеет дело с объектом тестового класса.
+
+4. **Часто используется с `@BeforeEach`**:
+   - `@AfterEach` дополняет `@BeforeEach`, предоставляя механизм очистки или сброса, который поддерживает тесты в изолированном состоянии.
+
+### Пример использования `@AfterEach`
+
+```java
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class ListTest {
+
+    private List<String> list;
+
+    @BeforeEach
+    void setup() {
+        list = new ArrayList<>();
+        list.add("Initial element");
+        System.out.println("List initialized before each test.");
+    }
+
+    @AfterEach
+    void cleanup() {
+        list.clear();
+        System.out.println("List cleared after each test.");
+    }
+
+    @Test
+    void testListAddition() {
+        list.add("New element");
+        System.out.println("Running testListAddition");
+        // Проверка, что элемент добавлен
+        assertEquals(2, list.size());
+    }
+
+    @Test
+    void testListClear() {
+        list.clear();
+        System.out.println("Running testListClear");
+        // Проверка, что список очищен
+        assertEquals(0, list.size());
+    }
+}
+```
+
+### Объяснение примера:
+
+- **Метод `setup()` с `@BeforeEach`**: Инициализирует список `list` перед каждым тестом и добавляет один элемент, чтобы каждый тест запускался с одним и тем же начальным состоянием.
+- **Метод `cleanup()` с `@AfterEach`**: Очищает `list` после каждого теста, гарантируя, что любые изменения, сделанные во время теста (например, добавление или удаление элементов), не повлияют на последующие тесты.
+- **Тесты**: Каждый тест начинается с известного состояния списка и завершается с очисткой, предотвращая влияние результатов одного теста на другой.
+
+### Типичные сценарии использования `@AfterEach`
+
+- **Освобождение ресурсов**: Закрытие соединений, освобождение памяти или других ресурсов, таких как временные файлы или потоки ввода-вывода.
+- **Очистка данных**: Сброс изменённых объектов, переменных или коллекций, чтобы они не повлияли на следующий тест.
+- **Логирование и отладка**: Удобно для вывода логов после тестов, чтобы отследить, как изменилось состояние.
+
+### Связь с аннотацией `@AfterAll`
+
+- `@AfterEach` применяется после каждого теста, в то время как `@AfterAll` запускается один раз после всех тестов в классе.
+- `@AfterEach` используется для регулярного сброса состояния теста, а `@AfterAll` — для окончательного освобождения ресурсов, которые использовались всеми тестами.
+
+### Важные моменты
+
+- **Изоляция**: `@AfterEach` важна для изоляции тестов, так как сбрасывает состояние, изменённое в конкретном тесте, и предотвращает его перенос в следующий тест.
+- **Универсальность**: Подходит для разнообразных задач по очистке, что позволяет поддерживать тесты в чистом и управляемом состоянии.
+- **Удобство для тестирования**: Аннотация позволяет тестам быть независимыми, а это упрощает их отладку и поддержку, так как каждый тест начинает и заканчивает с предсказуемым состоянием.
