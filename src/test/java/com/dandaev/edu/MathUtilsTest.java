@@ -9,7 +9,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+// @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class MathUtilsTest {
 	private MathUtils instance_to_test;
 	private static int counter = 0;
@@ -99,8 +102,7 @@ public class MathUtilsTest {
 	@Test
 	void testingDividerMethod() {
 		// если будет выброшен ArithmeticException, тест будет пройден успешно
-		assertThrows(ArithmeticException.class, () -> instance_to_test.divider(10, 0),
-				"divide by zero should throw ArithmeticException");
+		assertThrows(ArithmeticException.class, () -> instance_to_test.divider(10, 0),"divide by zero should throw ArithmeticException");
 
 		// если же не будет выброшен ArithmeticException, или будет выброшен Exception отличный от ArithmeticException, тест будет пройден нуспешно
 		// assertThrows(ArithmeticException.class, () -> instance_to_test.divider(10, 2), "divide by zero should throw ArithmeticException");

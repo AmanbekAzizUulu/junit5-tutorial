@@ -1221,3 +1221,183 @@ class MathUtilsTest {
 - Снижать количество ошибок в проекте.
 
 `@Test` является основным инструментом для создания тестов в JUnit, помогая разработчикам проверять и подтверждать правильность работы кода на каждом этапе разработки.
+
+---
+
+The `@TestInstance` annotation in JUnit 5 allows you to control the lifecycle of the test class instances. By default, JUnit creates a new instance of the test class for each test method. However, using `@TestInstance`, you can specify whether to use a "per-class" or "per-method" lifecycle, which affects how the test class is instantiated and managed.
+
+### Usage
+
+1. **`@TestInstance(Lifecycle.PER_CLASS)`**:
+   - When you annotate a test class with `@TestInstance(Lifecycle.PER_CLASS)`, JUnit will create a single instance of the test class and reuse it for all test methods.
+   - This is useful when you want to share state between test methods without needing to declare instance variables as `static`.
+
+   ```java
+   import org.junit.jupiter.api.*;
+
+   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+   public class MyTests {
+       private int counter;
+
+       @BeforeEach
+       void setUp() {
+           counter = 0;
+       }
+
+       @Test
+       void testOne() {
+           counter++;
+           Assertions.assertEquals(1, counter);
+       }
+
+       @Test
+       void testTwo() {
+           counter++;
+           Assertions.assertEquals(1, counter); // This will pass because of shared state
+       }
+   }
+   ```
+
+2. **`@TestInstance(Lifecycle.PER_METHOD)`**:
+   - This is the default behavior if you do not specify the annotation.
+   - JUnit creates a new instance of the test class for each test method, meaning instance variables will be reset for each method.
+
+   ```java
+   import org.junit.jupiter.api.*;
+
+   @TestInstance(TestInstance.Lifecycle.PER_METHOD) // This is the default
+   public class MyTests {
+       private int counter;
+
+       @BeforeEach
+       void setUp() {
+           counter = 0;
+       }
+
+       @Test
+       void testOne() {
+           counter++;
+           Assertions.assertEquals(1, counter);
+       }
+
+       @Test
+       void testTwo() {
+           counter++;
+           Assertions.assertEquals(0, counter); // This will fail because counter is reset
+       }
+   }
+   ```
+
+### Benefits of Using `@TestInstance`:
+
+- **State Sharing**: By using `PER_CLASS`, you can share state (like instance variables) across multiple test methods, which can simplify setup and teardown logic.
+- **Improved Readability**: Keeping related test methods within the same instance can improve readability and maintainability.
+
+### Considerations:
+
+- **Static Methods**: If you use `@TestInstance(Lifecycle.PER_CLASS)`, you cannot use `static` methods in your test class. JUnit requires that lifecycle methods (`@BeforeAll`, `@AfterAll`) be static when using the default `PER_METHOD` lifecycle.
+- **Memory Usage**: Using `PER_CLASS` might lead to increased memory usage if the test class holds a lot of state or resources.
+
+### Example with `@TestInstance`
+
+```java
+import org.junit.jupiter.api.*;
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class CalculatorTest {
+    private Calculator calculator;
+
+    @BeforeAll
+    void init() {
+        calculator = new Calculator();
+    }
+
+    @Test
+    void testAddition() {
+        Assertions.assertEquals(5, calculator.add(2, 3));
+    }
+
+    @Test
+    void testSubtraction() {
+        Assertions.assertEquals(1, calculator.subtract(3, 2));
+    }
+}
+```
+
+In this example, `Calculator` is instantiated only once, and the same instance is used for both test methods, which can be beneficial for stateful operations or configurations.
+
+---
+
+In JUnit 5, the `@TestInstance` annotation is used to define the lifecycle of the test class instance. By default, JUnit 5 creates a new instance of the test class for each test method, but `@TestInstance` allows you to change this behavior by choosing between `PER_METHOD` (the default) and `PER_CLASS` lifecycles.
+
+### Lifecycles
+
+1. **`@TestInstance(TestInstance.Lifecycle.PER_METHOD)`** (default):
+   - JUnit creates a **new instance of the test class for each test method**.
+   - This ensures that each test runs in isolation, with no shared state among methods.
+   - Since a new instance is created for each test, any instance variables are reset for each method.
+
+   ```java
+   import org.junit.jupiter.api.*;
+
+   @TestInstance(TestInstance.Lifecycle.PER_METHOD)
+   class CalculatorTest {
+       private int counter;
+
+       @Test
+       void testAddition() {
+           counter++; // counter is reset to 0 for each test method
+           Assertions.assertEquals(1, counter);
+       }
+
+       @Test
+       void testSubtraction() {
+           counter++; // This counter is separate from testAddition's counter
+           Assertions.assertEquals(1, counter);
+       }
+   }
+   ```
+
+2. **`@TestInstance(TestInstance.Lifecycle.PER_CLASS)`**:
+   - JUnit creates **a single instance of the test class**, which is shared across all test methods in the class.
+   - This enables state sharing across test methods, making it useful for scenarios where you want to maintain shared setup or variables.
+   - `@BeforeAll` and `@AfterAll` methods don’t need to be `static` when using `PER_CLASS`, as they can access instance variables.
+
+   ```java
+   import org.junit.jupiter.api.*;
+
+   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+   class CalculatorTest {
+       private int counter = 0;
+
+       @BeforeAll
+       void init() {
+           counter = 10;
+       }
+
+       @Test
+       void testAddition() {
+           counter += 5; // modifies shared state
+           Assertions.assertEquals(15, counter);
+       }
+
+       @Test
+       void testSubtraction() {
+           counter -= 5; // continues using shared state
+           Assertions.assertEquals(5, counter); // test results depend on previous tests
+       }
+   }
+   ```
+
+### When to Use `PER_CLASS`
+
+- **Shared State**: If tests need to share state or configurations, `PER_CLASS` can simplify setup.
+- **Resource-Intensive Initialization**: If creating a new instance for each test is expensive, sharing one instance can improve efficiency.
+- **Setup/Teardown Access**: `@BeforeAll` and `@AfterAll` can access instance variables directly without being `static` in `PER_CLASS`.
+
+### Considerations
+
+- **Isolation**: In `PER_CLASS`, tests are not fully isolated, so changes in one test may affect others.
+- **Static Method Restrictions**: `@BeforeAll` and `@AfterAll` must be static in `PER_METHOD` but can be instance methods in `PER_CLASS`.
+
+Using `@TestInstance` allows flexibility in how tests are organized and executed, balancing state-sharing needs with test isolation requirements.
