@@ -8,11 +8,16 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 // @TestInstance(TestInstance.Lifecycle.PER_METHOD)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MathUtilsTest {
 	private MathUtils instance_to_test;
 	private static int counter = 0;
@@ -59,6 +64,7 @@ public class MathUtilsTest {
 	}
 
 	@Test
+	@DisplayName("Testing arrays equality")
 	void testingArraysEquality() {
 		// int[] array_1 = new int[] { 0, 1, 2, 3, 4 };
 		// int[] array_2 = new int[] { 4, 3, 2, 1, 0 };
@@ -72,6 +78,7 @@ public class MathUtilsTest {
 	}
 
 	@Test
+	@DisplayName("Testing lists equality")
 	void testingListsEquality() {
 		// var expected_list_1 = Arrays.asList("apple", "banana", "cherry");
 		// var actual_list_1 = Arrays.asList("coconut", "banana", "cherry");
@@ -85,21 +92,27 @@ public class MathUtilsTest {
 	}
 
 	@Test
+	@Disabled
+	@DisplayName("Testing adder() method")
 	void testingAdderMethod() {
 		assertEquals(instance_to_test.adder(2, 3), 5, "sum of 2 and 3 should be 5");
 	}
 
 	@Test
+	@DisplayName("Testing subtractor() method")
 	void testingSubtractorMethod() {
 		assertEquals(instance_to_test.subtractor(3, 2), 1, "the result of subtraction should be 1");
 	}
 
 	@Test
+	@DisplayName("Testing circleArea() method")
 	void testingComputationOfCircleArea() {
 		assertEquals(instance_to_test.circleArea(10), 314.1592653589793);
 	}
 
 	@Test
+	@Disabled
+	@DisplayName("Testing divider() method")
 	void testingDividerMethod() {
 		// если будет выброшен ArithmeticException, тест будет пройден успешно
 		assertThrows(ArithmeticException.class, () -> instance_to_test.divider(10, 0),"divide by zero should throw ArithmeticException");
@@ -107,4 +120,16 @@ public class MathUtilsTest {
 		// если же не будет выброшен ArithmeticException, или будет выброшен Exception отличный от ArithmeticException, тест будет пройден нуспешно
 		// assertThrows(ArithmeticException.class, () -> instance_to_test.divider(10, 2), "divide by zero should throw ArithmeticException");
 	}
+
+	@Test
+    @EnabledOnOs(OS.MAC)
+    void runOnlyOnMac() {
+        // This test only runs on Mac
+    }
+
+    @Test
+    @EnabledIfEnvironmentVariable(named = "ENV", matches = "PROD")
+    void runOnlyOnProdEnvironment() {
+        // This test only runs if the ENV environment variable is set to "PROD"
+    }
 }

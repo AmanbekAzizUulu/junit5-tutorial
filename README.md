@@ -1401,3 +1401,162 @@ In JUnit 5, the `@TestInstance` annotation is used to define the lifecycle of th
 - **Static Method Restrictions**: `@BeforeAll` and `@AfterAll` must be static in `PER_METHOD` but can be instance methods in `PER_CLASS`.
 
 Using `@TestInstance` allows flexibility in how tests are organized and executed, balancing state-sharing needs with test isolation requirements.
+
+---
+
+The `@DisplayName` annotation in JUnit 5 allows you to specify a custom name for test classes and test methods. This name appears in test reports and in the console output, making it easier to understand the purpose of each test, especially if the test name itself might not be descriptive enough or if you want to use a more readable format.
+
+### Key Features
+- **Custom Names**: You can provide a more human-readable name, including spaces, special characters, or even emojis.
+- **Improved Readability**: Useful for making test output more understandable at a glance.
+- **Documentation**: Helps in documenting the intention of the test directly in the output.
+
+### Usage Examples
+
+#### Applying `@DisplayName` to a Test Method
+
+```java
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class CalculatorTest {
+
+    @Test
+    @DisplayName("Adding two positive numbers")
+    void testAddition() {
+        assertEquals(5, 2 + 3, "2 + 3 should equal 5");
+    }
+
+    @Test
+    @DisplayName("Subtracting two numbers")
+    void testSubtraction() {
+        assertEquals(1, 3 - 2, "3 - 2 should equal 1");
+    }
+}
+```
+
+In this example, when running the tests, instead of showing the method names `testAddition` and `testSubtraction`, JUnit will display:
+- **Adding two positive numbers**
+- **Subtracting two numbers**
+
+#### Applying `@DisplayName` to a Test Class
+
+```java
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+@DisplayName("Calculator Test Suite")
+class CalculatorTest {
+
+    @Test
+    @DisplayName("Positive Addition Test")
+    void additionTest() {
+        // Test logic
+    }
+
+    @Test
+    @DisplayName("Positive Subtraction Test")
+    void subtractionTest() {
+        // Test logic
+    }
+}
+```
+
+When the class is executed, it will appear as **Calculator Test Suite** in test reports, providing context for all contained test cases.
+
+### Example with Emojis and Special Characters
+
+You can use emojis or special symbols to make test names even more visually descriptive, especially in a team setting where certain symbols may indicate priority or status.
+
+```java
+@DisplayName("🔢 Calculator Tests 🚀")
+class CalculatorTest {
+
+    @Test
+    @DisplayName("✅ Adding two numbers works correctly")
+    void additionTest() {
+        // Test logic
+    }
+}
+```
+
+### Advantages of `@DisplayName`
+- **Clarity**: Helps clarify test intent, which is particularly useful for complex tests.
+- **Organization**: Useful for grouping related tests with a descriptive name.
+- **Flexibility**: Allows using any readable format, including spaces, punctuation, and emojis, which helps make test results accessible to non-developers.
+
+In summary, `@DisplayName` provides flexibility in naming tests, making test reports more readable and useful for both developers and non-developers.
+
+---
+
+The `@Disabled` annotation in JUnit 5 is used to temporarily disable a test class or test method. When a test is annotated with `@Disabled`, it will be skipped during execution, meaning JUnit will not run it, and it will not be counted as a failure or success in the test results. This can be useful for tests that are under development, are currently broken, or need to be skipped for other reasons.
+
+### Usage of `@Disabled`
+
+1. **Disabling Individual Test Methods**: Add `@Disabled` to specific test methods you want to skip.
+2. **Disabling an Entire Test Class**: Place `@Disabled` above a class definition to skip all test methods within the class.
+
+### Optional Description
+
+You can provide an optional `String` value to `@Disabled` to explain why the test is disabled. This is a helpful practice, as it informs others (and yourself in the future) of the reason the test is skipped.
+
+### Examples
+
+#### Disabling a Single Test Method
+
+```java
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class CalculatorTest {
+
+    @Test
+    void additionTest() {
+        assertEquals(5, 2 + 3);
+    }
+
+    @Test
+    @Disabled("Test temporarily disabled due to known issue")
+    void subtractionTest() {
+        assertEquals(1, 3 - 2); // This test will not run
+    }
+}
+```
+
+In this example, `subtractionTest` is marked as disabled, and the message `"Test temporarily disabled due to known issue"` will be shown in the test report, explaining why the test was skipped.
+
+#### Disabling an Entire Class
+
+```java
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+@Disabled("Calculator tests are under maintenance")
+class CalculatorTest {
+
+    @Test
+    void additionTest() {
+        // This test will not run
+    }
+
+    @Test
+    void subtractionTest() {
+        // This test will also not run
+    }
+}
+```
+
+With `@Disabled` applied to the class, **all tests in `CalculatorTest`** are skipped.
+
+### Key Points
+
+- **Temporary Disabling**: `@Disabled` is generally used to skip tests temporarily. It’s a good practice to avoid leaving tests disabled for long periods.
+- **Optional Message**: Adding a reason for disabling is helpful for team communication and future maintenance.
+- **Flexible Scope**: `@Disabled` can be used at the method or class level, giving flexibility in disabling specific tests or entire suites.
+
+### Best Practices
+
+- **Document the Reason**: Always specify why a test is disabled.
+- **Review Disabled Tests Regularly**: Regularly review and remove `@Disabled` annotations once the underlying issues are resolved, to ensure that your test suite remains comprehensive.
