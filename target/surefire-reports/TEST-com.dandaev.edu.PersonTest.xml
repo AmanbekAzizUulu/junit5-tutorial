@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.dandaev.edu.MathUtilsTest" time="6.165" tests="9" errors="0" skipped="4" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.dandaev.edu.PersonTest" time="0.556" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-21\bin"/>
-    <property name="sun.java.command" value="C:\Users\User\AppData\Local\Temp\surefire11266600317732845417\surefirebooter-20241106014715519_3.jar C:\Users\User\AppData\Local\Temp\surefire11266600317732845417 2024-11-06T01-47-15_400-jvmRun1 surefire-20241106014715519_1tmp surefire_0-20241106014715519_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\User\AppData\Local\Temp\surefire1389728837489903416\surefirebooter241479129071853470.jar C:\Users\User\AppData\Local\Temp\surefire1389728837489903416 2024-11-06T01-50-53_587-jvmRun1 surefire7541266711734503104tmp surefire_07724794613757374817tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="D:\JavaLanguage\EducationalProjects_VSCode\junit-5\junit-tutorial\target\test-classes;D:\JavaLanguage\EducationalProjects_VSCode\junit-5\junit-tutorial\target\classes;C:\Users\User\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.11.0\junit-jupiter-api-5.11.0.jar;C:\Users\User\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\User\.m2\repository\org\junit\platform\junit-platform-commons\1.11.0\junit-platform-commons-1.11.0.jar;C:\Users\User\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\User\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.11.0\junit-jupiter-engine-5.11.0.jar;C:\Users\User\.m2\repository\org\junit\platform\junit-platform-engine\1.11.0\junit-platform-engine-1.11.0.jar;C:\Users\User\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.11.0\junit-jupiter-params-5.11.0.jar;C:\Users\User\.m2\repository\org\apache\commons\commons-lang3\3.12.0\commons-lang3-3.12.0.jar;C:\Users\User\.m2\repository\org\apache\maven\plugins\maven-surefire-plugin\3.5.1\maven-surefire-plugin-3.5.1.jar;C:\Users\User\.m2\repository\org\apache\maven\surefire\surefire-api\3.5.1\surefire-api-3.5.1.jar;C:\Users\User\.m2\repository\org\apache\maven\surefire\surefire-logger-api\3.5.1\surefire-logger-api-3.5.1.jar;C:\Users\User\.m2\repository\org\apache\maven\surefire\surefire-shared-utils\3.5.1\surefire-shared-utils-3.5.1.jar;C:\Users\User\.m2\repository\org\apache\maven\surefire\surefire-extensions-api\3.5.1\surefire-extensions-api-3.5.1.jar;C:\Users\User\.m2\repository\org\apache\maven\surefire\maven-surefire-common\3.5.1\maven-surefire-common-3.5.1.jar;C:\Users\User\.m2\repository\org\apache\maven\surefire\surefire-booter\3.5.1\surefire-booter-3.5.1.jar;C:\Users\User\.m2\repository\org\apache\maven\surefire\surefire-extensions-spi\3.5.1\surefire-extensions-spi-3.5.1.jar;C:\Users\User\.m2\repository\org\apache\maven\resolver\maven-resolver-util\1.4.1\maven-resolver-util-1.4.1.jar;C:\Users\User\.m2\repository\org\apache\maven\resolver\maven-resolver-api\1.4.1\maven-resolver-api-1.4.1.jar;C:\Users\User\.m2\repository\org\apache\maven\shared\maven-common-artifact-filters\3.4.0\maven-common-artifact-filters-3.4.0.jar;C:\Users\User\.m2\repository\org\slf4j\slf4j-api\1.7.36\slf4j-api-1.7.36.jar;C:\Users\User\.m2\repository\org\codehaus\plexus\plexus-java\1.3.0\plexus-java-1.3.0.jar;C:\Users\User\.m2\repository\org\ow2\asm\asm\9.7\asm-9.7.jar;C:\Users\User\.m2\repository\com\thoughtworks\qdox\qdox\2.1.0\qdox-2.1.0.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -31,7 +31,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\User\AppData\Local\Temp\surefire11266600317732845417\surefirebooter-20241106014715519_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\User\AppData\Local\Temp\surefire1389728837489903416\surefirebooter241479129071853470.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.3+7-LTS-152"/>
@@ -60,47 +60,8 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="testingSubtractorMethod" classname="com.dandaev.edu.MathUtilsTest" time="1.036">
-    <system-out><![CDATA[Setting up resources ....
-1 — Initializing of test instance ....
-1 — Cleaning up ....
+  <testcase name="slowTest" classname="com.dandaev.edu.PersonTest" time="0.535">
+    <system-out><![CDATA[Slow test running ....
 ]]></system-out>
-    <system-err><![CDATA[нояб. 06, 2024 1:47:16 AM org.junit.jupiter.engine.discovery.MethodSelectorResolver resolve
-WARNING: Possible configuration error: method [void com.dandaev.edu.PersonTest$GetterSetterTests.testSetAndGetFirstName()] resulted in multiple TestDescriptors [org.junit.jupiter.engine.descriptor.TestTemplateTestDescriptor, org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor]. This is typically the result of annotating a method with multiple competing annotations such as @Test, @RepeatedTest, @ParameterizedTest, @TestFactory, etc.
-нояб. 06, 2024 1:47:16 AM org.junit.jupiter.engine.discovery.MethodSelectorResolver resolve
-WARNING: Possible configuration error: method [void com.dandaev.edu.PersonTest$GetterSetterTests.testSetAndGetFirstName()] resulted in multiple TestDescriptors [org.junit.jupiter.engine.descriptor.TestTemplateTestDescriptor, org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor]. This is typically the result of annotating a method with multiple competing annotations such as @Test, @RepeatedTest, @ParameterizedTest, @TestFactory, etc.
-]]></system-err>
-  </testcase>
-  <testcase name="testMultipleAssertions" classname="com.dandaev.edu.MathUtilsTest" time="1.017">
-    <system-out><![CDATA[2 — Initializing of test instance ....
-2 — Cleaning up ....
-]]></system-out>
-  </testcase>
-  <testcase name="runOnlyOnMac" classname="com.dandaev.edu.MathUtilsTest" time="0.0">
-    <skipped message="Disabled on operating system: Windows 10"/>
-  </testcase>
-  <testcase name="testingComputationOfCircleArea" classname="com.dandaev.edu.MathUtilsTest" time="1.019">
-    <system-out><![CDATA[3 — Initializing of test instance ....
-3 — Cleaning up ....
-]]></system-out>
-  </testcase>
-  <testcase name="testingListsEquality" classname="com.dandaev.edu.MathUtilsTest" time="1.022">
-    <system-out><![CDATA[4 — Initializing of test instance ....
-4 — Cleaning up ....
-]]></system-out>
-  </testcase>
-  <testcase name="testingDividerMethod" classname="com.dandaev.edu.MathUtilsTest" time="0.0">
-    <skipped message="void com.dandaev.edu.MathUtilsTest.testingDividerMethod() is @Disabled"/>
-  </testcase>
-  <testcase name="runOnlyOnProdEnvironment" classname="com.dandaev.edu.MathUtilsTest" time="0.0">
-    <skipped message="Environment variable [ENV] does not exist"/>
-  </testcase>
-  <testcase name="testingArraysEquality" classname="com.dandaev.edu.MathUtilsTest" time="1.02">
-    <system-out><![CDATA[5 — Initializing of test instance ....
-5 — Cleaning up ....
-]]></system-out>
-  </testcase>
-  <testcase name="testingAdderMethod" classname="com.dandaev.edu.MathUtilsTest" time="0.0">
-    <skipped message="void com.dandaev.edu.MathUtilsTest.testingAdderMethod() is @Disabled"/>
   </testcase>
 </testsuite>

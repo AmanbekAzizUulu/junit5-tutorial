@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.dandaev.edu.MathUtilsTest" time="6.165" tests="9" errors="0" skipped="4" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.dandaev.edu.PersonTest$DefaultValuesTests" time="0.0" tests="6" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -60,47 +60,13 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="testingSubtractorMethod" classname="com.dandaev.edu.MathUtilsTest" time="1.036">
-    <system-out><![CDATA[Setting up resources ....
-1 — Initializing of test instance ....
-1 — Cleaning up ....
-]]></system-out>
-    <system-err><![CDATA[нояб. 06, 2024 1:47:16 AM org.junit.jupiter.engine.discovery.MethodSelectorResolver resolve
-WARNING: Possible configuration error: method [void com.dandaev.edu.PersonTest$GetterSetterTests.testSetAndGetFirstName()] resulted in multiple TestDescriptors [org.junit.jupiter.engine.descriptor.TestTemplateTestDescriptor, org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor]. This is typically the result of annotating a method with multiple competing annotations such as @Test, @RepeatedTest, @ParameterizedTest, @TestFactory, etc.
-нояб. 06, 2024 1:47:16 AM org.junit.jupiter.engine.discovery.MethodSelectorResolver resolve
-WARNING: Possible configuration error: method [void com.dandaev.edu.PersonTest$GetterSetterTests.testSetAndGetFirstName()] resulted in multiple TestDescriptors [org.junit.jupiter.engine.descriptor.TestTemplateTestDescriptor, org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor]. This is typically the result of annotating a method with multiple competing annotations such as @Test, @RepeatedTest, @ParameterizedTest, @TestFactory, etc.
-]]></system-err>
-  </testcase>
-  <testcase name="testMultipleAssertions" classname="com.dandaev.edu.MathUtilsTest" time="1.017">
-    <system-out><![CDATA[2 — Initializing of test instance ....
-2 — Cleaning up ....
+  <testcase name="testPersonEquality" classname="com.dandaev.edu.PersonTest" time="0.0"/>
+  <testcase name="slowTest" classname="com.dandaev.edu.PersonTest" time="0.509">
+    <system-out><![CDATA[Slow test running ....
 ]]></system-out>
   </testcase>
-  <testcase name="runOnlyOnMac" classname="com.dandaev.edu.MathUtilsTest" time="0.0">
-    <skipped message="Disabled on operating system: Windows 10"/>
-  </testcase>
-  <testcase name="testingComputationOfCircleArea" classname="com.dandaev.edu.MathUtilsTest" time="1.019">
-    <system-out><![CDATA[3 — Initializing of test instance ....
-3 — Cleaning up ....
-]]></system-out>
-  </testcase>
-  <testcase name="testingListsEquality" classname="com.dandaev.edu.MathUtilsTest" time="1.022">
-    <system-out><![CDATA[4 — Initializing of test instance ....
-4 — Cleaning up ....
-]]></system-out>
-  </testcase>
-  <testcase name="testingDividerMethod" classname="com.dandaev.edu.MathUtilsTest" time="0.0">
-    <skipped message="void com.dandaev.edu.MathUtilsTest.testingDividerMethod() is @Disabled"/>
-  </testcase>
-  <testcase name="runOnlyOnProdEnvironment" classname="com.dandaev.edu.MathUtilsTest" time="0.0">
-    <skipped message="Environment variable [ENV] does not exist"/>
-  </testcase>
-  <testcase name="testingArraysEquality" classname="com.dandaev.edu.MathUtilsTest" time="1.02">
-    <system-out><![CDATA[5 — Initializing of test instance ....
-5 — Cleaning up ....
-]]></system-out>
-  </testcase>
-  <testcase name="testingAdderMethod" classname="com.dandaev.edu.MathUtilsTest" time="0.0">
-    <skipped message="void com.dandaev.edu.MathUtilsTest.testingAdderMethod() is @Disabled"/>
-  </testcase>
+  <testcase name="testFullNameConcatenation" classname="com.dandaev.edu.PersonTest" time="0.0"/>
+  <testcase name="testDefaultAge" classname="com.dandaev.edu.PersonTest$DefaultValuesTests" time="0.0"/>
+  <testcase name="testDefaultLastName" classname="com.dandaev.edu.PersonTest$DefaultValuesTests" time="0.0"/>
+  <testcase name="testDefaultFirstName" classname="com.dandaev.edu.PersonTest$DefaultValuesTests" time="0.0"/>
 </testsuite>

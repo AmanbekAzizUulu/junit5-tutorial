@@ -1,22 +1,5 @@
 # Getting Started
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
-
-## Folder Structure
-
-The workspace contains two folders by default, where:
-
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
-
 ---
 
 Test-driven programming, often referred to as **Test-Driven Development (TDD)**, is a software development methodology that emphasizes writing tests before writing the actual code that implements functionality. This approach can help ensure that the code is correct and meets the specified requirements. Here’s an overview of the key principles and practices of TDD:
@@ -2116,3 +2099,987 @@ A **Test Method** is the fundamental building block of testing in JUnit. By usin
 - Методы тестирования должны быть `void`, без параметров (кроме параметризованных тестов), аннотированы, доступные JUnit (public или package-private), без проверяемых исключений, с информативными названиями и независимыми.
 
 Эти правила делают тесты надёжными, понятными и воспроизводимыми, что упрощает их использование и отладку.
+
+
+---
+
+
+В JUnit, вложенные (nested) классы используются для группировки тестов и логически разделяют разные аспекты тестирования одного класса или функциональности. Это удобно, когда есть несколько связанных тестов, которые можно организовать в одном основном классе, но они проверяют разные части функциональности или разные сценарии.
+
+В JUnit 5 добавлена поддержка вложенных классов с помощью аннотации `@Nested`. Этот подход позволяет создавать более структурированные и организованные тесты.
+
+### Пример: Использование `@Nested` в тестах JUnit
+
+```java
+import org.junit.jupiter.api.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class MathUtilsTest {
+
+    private MathUtils mathUtils;
+
+    @BeforeEach
+    void setUp() {
+        mathUtils = new MathUtils();
+    }
+
+    @Nested
+    @DisplayName("Tests for the adder method")
+    class AdderTests {
+        @Test
+        @DisplayName("Adding two positive numbers")
+        void addPositiveNumbers() {
+            assertEquals(7, mathUtils.adder(3, 4));
+        }
+
+        @Test
+        @DisplayName("Adding a positive and a negative number")
+        void addPositiveAndNegativeNumber() {
+            assertEquals(1, mathUtils.adder(3, -2));
+        }
+    }
+
+    @Nested
+    @DisplayName("Tests for the subtractor method")
+    class SubtractorTests {
+        @Test
+        @DisplayName("Subtracting two positive numbers")
+        void subtractPositiveNumbers() {
+            assertEquals(2, mathUtils.subtractor(5, 3));
+        }
+
+        @Test
+        @DisplayName("Subtracting a larger number from a smaller number")
+        void subtractLargerFromSmaller() {
+            assertEquals(-3, mathUtils.subtractor(2, 5));
+        }
+    }
+
+    @Nested
+    @DisplayName("Tests for the divider method")
+    class DividerTests {
+        @Test
+        @DisplayName("Dividing by a non-zero number")
+        void divideByNonZero() {
+            assertEquals(2.5, mathUtils.divider(5, 2), 0.01);
+        }
+
+        @Test
+        @DisplayName("Dividing by zero should throw ArithmeticException")
+        void divideByZero() {
+            assertThrows(ArithmeticException.class, () -> mathUtils.divider(10, 0), "divide by zero should throw ArithmeticException");
+        }
+    }
+}
+```
+
+### Разбор примера:
+
+1. **Основной тестовый класс `MathUtilsTest`**:
+   - В этом классе мы создаём экземпляр `MathUtils`, который используется в каждом из тестов.
+
+2. **Вложенные классы с аннотацией `@Nested`**:
+   - **`AdderTests`** — вложенный класс, содержащий тесты для метода `adder`. Он проверяет различные сценарии сложения чисел.
+   - **`SubtractorTests`** — вложенный класс для тестов метода `subtractor`. Он также проверяет несколько сценариев вычитания.
+   - **`DividerTests`** — вложенный класс для тестов метода `divider`. Он проверяет обычное деление и деление на ноль, которое должно вызвать исключение.
+
+3. **Аннотация `@DisplayName`**:
+   - `@DisplayName` используется для создания читаемых имён тестов. Это улучшает читаемость вывода тестов, так как каждый тест и каждый вложенный класс получают понятное описание, отображаемое при запуске тестов.
+
+4. **Организация тестов**:
+   - Каждое из тестовых условий (например, сложение, вычитание, деление) логически разделено по классам, что делает тесты более структурированными и помогает избежать путаницы при работе с большими наборами тестов.
+
+### Преимущества вложенных классов в JUnit:
+
+- **Организация и структура**: Группировка тестов в классы помогает разбить крупные тестовые сценарии на небольшие логически связанные блоки.
+- **Повторное использование и настройка окружения**: Можно использовать разные `@BeforeEach` и `@AfterEach` методы для разных вложенных классов, если требуется настроить окружение по-разному для каждой группы тестов.
+- **Улучшение читаемости**: `@DisplayName` помогает добавить описательные заголовки для каждого теста и каждого набора тестов, что делает тесты более понятными при их чтении.
+
+### Заключение
+
+Вложенные тесты с `@Nested` полезны для организации сложных тестов и помогают сделать тестовые классы более структурированными и понятными.
+
+---
+
+
+In JUnit 5, you can use `Supplier<String>` to defer the creation of assertion messages until they are needed. This is useful in situations where constructing the message might be costly in terms of performance. The message will only be created if the assertion fails.
+
+Here's how you can use a `Supplier<String>` in JUnit assertions:
+
+```java
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+class PersonTest {
+
+    @Test
+    void testFirstName() {
+        Person person = new Person("John", "Doe", 25);
+        assertEquals("John", person.getFirstName(), () -> "Expected first name to be 'John' but was '" + person.getFirstName() + "'");
+    }
+
+    @Test
+    void testLastName() {
+        Person person = new Person("John", "Doe", 25);
+        assertEquals("Doe", person.getLastName(), () -> "Expected last name to be 'Doe' but was '" + person.getLastName() + "'");
+    }
+
+    @Test
+    void testAge() {
+        Person person = new Person("John", "Doe", 25);
+        assertEquals(25, person.getAge(), () -> "Expected age to be 25 but was " + person.getAge());
+    }
+}
+```
+
+### Explanation
+
+- **Message as `Supplier<String>`**: Instead of passing a simple `String` as the last parameter in `assertEquals`, we pass a lambda expression (`() -> "message"`). This lambda will only be evaluated if the assertion fails, meaning the message will only be constructed in case of failure.
+
+- **Performance Benefit**: When the test passes, JUnit doesn’t create the message, which is particularly helpful if constructing the message involves complex calculations or expensive operations.
+
+Using `Supplier<String>` for assertion messages is recommended in scenarios where the message creation is complex or computationally expensive, as it prevents unnecessary overhead during test execution.
+
+
+---
+
+The `@RepeatedTest` annotation in JUnit 5 is used to run the same test multiple times. This can be useful in cases where you want to verify that a piece of code behaves consistently or is reliable over repeated executions. It’s often applied in scenarios like:
+
+- Testing code that may produce different results on repeated executions, such as random number generation.
+- Checking for potential issues related to caching, memory leaks, or concurrency, which might only become apparent after multiple runs.
+- Ensuring stability under repetitive conditions, such as with performance-sensitive code.
+
+### Basic Usage
+
+The `@RepeatedTest` annotation takes a single parameter, `value`, which specifies the number of times the test should run.
+
+```java
+import org.junit.jupiter.api.RepeatedTest;
+import static org.junit.jupiter.api.Assertions.*;
+
+class MyTests {
+
+    @RepeatedTest(5)  // Run this test 5 times
+    void testRepeatedExecution() {
+        int expected = 5;
+        int actual = 2 + 3;
+        assertEquals(expected, actual, "2 + 3 should equal 5");
+    }
+}
+```
+
+In this example, the `testRepeatedExecution` method will run 5 times, and each time, JUnit will assert that `2 + 3` equals `5`.
+
+### Accessing Repetition Information
+
+JUnit 5 also allows you to add a `RepetitionInfo` parameter to the test method to get information about the current repetition count and total repetitions. This can be useful if you want to customize behavior based on the repetition number.
+
+```java
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.RepetitionInfo;
+
+class MyTests {
+
+    @RepeatedTest(3)
+    void testWithRepetitionInfo(RepetitionInfo repetitionInfo) {
+        System.out.println("Repetition " + repetitionInfo.getCurrentRepetition() +
+                           " of " + repetitionInfo.getTotalRepetitions());
+        // Additional test logic here
+    }
+}
+```
+
+Here, `RepetitionInfo` allows us to see which repetition is currently running. If this test is set to run 3 times, the output will show:
+```
+Repetition 1 of 3
+Repetition 2 of 3
+Repetition 3 of 3
+```
+
+### Custom Display Names
+
+You can provide custom display names for each repetition by using `name` in `@RepeatedTest`. It allows placeholders like `{currentRepetition}` and `{totalRepetitions}`.
+
+```java
+@RepeatedTest(value = 3, name = "Repetition {currentRepetition} of {totalRepetitions}")
+void customDisplayNameTest() {
+    // Test logic
+}
+```
+
+### Benefits of Using `@RepeatedTest`
+
+- **Consistency Checks**: Helps identify flaky tests, which might pass or fail inconsistently due to timing or other factors.
+- **Performance and Load Testing**: Enables repeated execution to observe performance under repeated load.
+- **Concurrency Testing**: Can help detect issues that only emerge in certain concurrent situations.
+
+The `@RepeatedTest` annotation is a valuable tool in scenarios where test stability, consistency, and repeated behavior need to be verified.
+
+---
+
+In Java, the `@Repeatable` annotation allows you to apply the same annotation multiple times to a single element. Introduced in Java 8, it’s commonly used for cases where an element needs more than one instance of the same annotation type, such as in scenarios where you want to specify multiple configurations or settings for a particular method, class, or field.
+
+### How `@Repeatable` Works
+
+To make an annotation repeatable, you define it with the `@Repeatable` annotation, which itself takes a container annotation as an argument. The container annotation holds multiple instances of the repeatable annotation.
+
+Here’s a breakdown of how to create and use a repeatable annotation.
+
+### Step-by-Step Example
+
+1. **Define the Repeatable Annotation**: Create an annotation (e.g., `@Role`) that can be repeated. Mark it with `@Repeatable`, specifying a container annotation (`Roles`) that will hold multiple instances of `@Role`.
+
+2. **Define the Container Annotation**: Create the container annotation (`@Roles`), which is simply an annotation that has an array of the repeatable annotation (in this case, `Role[]`).
+
+3. **Use the Repeatable Annotation**: Apply the annotation multiple times to a target element (like a class or method).
+
+### Example Code
+
+Let’s go through the example of a `Role` annotation, which can be used multiple times to assign different roles to a user.
+
+#### Step 1: Define the Repeatable Annotation
+
+```java
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Repeatable(Roles.class)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Role {
+    String value();
+}
+```
+
+#### Step 2: Define the Container Annotation
+
+```java
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Roles {
+    Role[] value();
+}
+```
+
+#### Step 3: Apply the Repeatable Annotation
+
+Now, you can use `@Role` multiple times on a class or method.
+
+```java
+@Role("Admin")
+@Role("User")
+public class Person {
+    // class implementation
+}
+```
+
+Alternatively, without using `@Repeatable`, you would need to use the container annotation directly, like this:
+
+```java
+@Roles({
+    @Role("Admin"),
+    @Role("User")
+})
+public class Person {
+    // class implementation
+}
+```
+
+### Accessing Repeatable Annotations via Reflection
+
+To retrieve repeatable annotations at runtime, use reflection. If `@Role` is used multiple times on a class, you can retrieve them as follows:
+
+```java
+import java.lang.annotation.Annotation;
+
+public class AnnotationExample {
+    public static void main(String[] args) {
+        Class<Person> personClass = Person.class;
+
+        // Retrieve all Role annotations
+        Role[] roles = personClass.getAnnotationsByType(Role.class);
+
+        for (Role role : roles) {
+            System.out.println("Role: " + role.value());
+        }
+    }
+}
+```
+
+### Benefits and Use Cases of `@Repeatable`
+
+- **Increased Flexibility**: Allows cleaner code, especially in configurations or metadata where multiple annotations of the same type are needed.
+- **Improved Readability**: Instead of wrapping annotations in a container manually, `@Repeatable` enables straightforward usage.
+- **Common Use Cases**:
+  - Specifying multiple roles or permissions (as in the example above).
+  - Declaring multiple scheduled tasks or configurations for testing.
+  - Documenting multiple authors or contributors for code elements.
+
+Using `@Repeatable` simplifies working with repeated configurations and improves readability by allowing direct, concise annotation application.
+
+---
+
+The `@Repeatable` annotation in Java is used to indicate that an annotation type can be applied multiple times to a single declaration (e.g., class, method, field). The primary difference between `@Repeatable` annotations and regular annotations lies in how you can apply and access them. Here's a detailed comparison of these two types:
+
+### 1. Application
+
+- **Regular Annotation**:
+  - A standard annotation can only be applied once to a target element.
+  - If you try to apply it more than once, it will result in a compilation error.
+
+  **Example**:
+  ```java
+  @MyAnnotation
+  @MyAnnotation // This will cause a compilation error
+  public class Example {}
+  ```
+
+- **Repeatable Annotation**:
+  - A repeatable annotation can be applied multiple times to the same element.
+  - You must use a container annotation (defined with `@Repeatable`) to hold the repeated instances or simply apply the annotation multiple times directly.
+
+  **Example**:
+  ```java
+  @Role("Admin")
+  @Role("User") // Allowed because Role is repeatable
+  public class User {}
+  ```
+
+### 2. Container Annotation
+
+- **Regular Annotation**:
+  - Does not require a container annotation. You simply declare the annotation.
+
+- **Repeatable Annotation**:
+  - Requires a container annotation, which must be defined to hold the array of the repeatable annotation instances.
+  - The container annotation is marked with the same retention policy as the repeatable annotation.
+
+  **Example of Container**:
+  ```java
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface Roles {
+      Role[] value();
+  }
+  ```
+
+### 3. Accessing Annotations
+
+- **Regular Annotation**:
+  - You access a regular annotation using the `getAnnotation()` method.
+
+  **Example**:
+  ```java
+  MyAnnotation annotation = myClass.getAnnotation(MyAnnotation.class);
+  ```
+
+- **Repeatable Annotation**:
+  - You can retrieve all instances of the repeatable annotation using `getAnnotationsByType()`, which returns an array of all instances of that annotation.
+
+  **Example**:
+  ```java
+  Role[] roles = myClass.getAnnotationsByType(Role.class);
+  ```
+
+### 4. Design Purpose
+
+- **Regular Annotation**:
+  - Used for situations where a single instance is sufficient to convey the needed information.
+  - Ideal for single-value configurations or settings.
+
+- **Repeatable Annotation**:
+  - Used when the same kind of information needs to be specified multiple times for a single element.
+  - Useful for scenarios such as specifying multiple roles, permissions, or multiple values for a single attribute.
+
+### Summary
+
+| Feature                        | Regular Annotation                          | Repeatable Annotation                      |
+|--------------------------------|--------------------------------------------|-------------------------------------------|
+| **Application**                | Can only be used once per target element. | Can be applied multiple times.            |
+| **Container Requirement**      | No container needed.                       | Requires a container annotation.          |
+| **Access Method**             | `getAnnotation()`                          | `getAnnotationsByType()`                  |
+| **Design Purpose**             | For single-value configurations.           | For specifying multiple values.           |
+
+### Conclusion
+
+The main difference lies in the flexibility offered by repeatable annotations, allowing developers to express complex configurations or metadata more clearly without needing to define multiple container annotations or change existing code structures. This feature enhances code readability and maintainability, especially in cases where multiple similar attributes are necessary.
+
+---
+
+The `@Repeatable` and `@RepeatedTest` annotations serve different purposes in Java's annotation and testing frameworks, specifically JUnit 5. Here’s a detailed breakdown of the differences between them:
+
+### 1. **Purpose**
+
+- **`@Repeatable`**:
+  - This annotation is used to indicate that an annotation type can be applied multiple times to the same declaration (e.g., a class, method, or field).
+  - It allows developers to define annotations that can be stacked on top of each other, providing flexibility in specifying multiple attributes.
+
+- **`@RepeatedTest`**:
+  - This annotation is used to indicate that a test method should be executed multiple times.
+  - It is part of the JUnit 5 testing framework and is designed specifically for test execution, allowing developers to run the same test with the specified number of repetitions.
+
+### 2. **Usage**
+
+- **`@Repeatable`**:
+  - When you declare an annotation with `@Repeatable`, you must also define a container annotation that holds an array of the repeatable annotations.
+  - It is used for metadata and can be applied to any element (classes, methods, fields, etc.).
+
+  **Example**:
+  ```java
+  @Repeatable(Roles.class)
+  public @interface Role {
+      String value();
+  }
+
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface Roles {
+      Role[] value();
+  }
+  ```
+
+- **`@RepeatedTest`**:
+  - It is used on test methods within a test class to specify how many times the test should be executed.
+  - It can include additional parameters to control the execution, such as the display name for each repetition.
+
+  **Example**:
+  ```java
+  @RepeatedTest(5)
+  void testMethod() {
+      // This test will run 5 times
+  }
+  ```
+
+### 3. **Context of Use**
+
+- **`@Repeatable`**:
+  - Used in the context of defining custom annotations that can be applied repeatedly.
+  - Useful for scenarios where multiple annotations need to convey related information, like roles, permissions, or configuration settings.
+
+- **`@RepeatedTest`**:
+  - Used in the context of unit testing to allow a single test method to be executed multiple times.
+  - Useful for validating that a particular behavior is consistent across multiple executions, such as random data tests or performance tests.
+
+### 4. **Example**
+
+- **Using `@Repeatable`**:
+  ```java
+  @Repeatable(Roles.class)
+  public @interface Role {
+      String value();
+  }
+
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface Roles {
+      Role[] value();
+  }
+
+  @Role("Admin")
+  @Role("User")
+  public class User {}
+  ```
+
+- **Using `@RepeatedTest`**:
+  ```java
+  import org.junit.jupiter.api.RepeatedTest;
+
+  public class ExampleTest {
+      @RepeatedTest(3)
+      void test() {
+          System.out.println("This test will run 3 times");
+      }
+  }
+  ```
+
+### Summary of Differences
+
+| Feature                | `@Repeatable`                        | `@RepeatedTest`                         |
+|------------------------|-------------------------------------|-----------------------------------------|
+| **Purpose**            | Enables annotations to be repeated  | Allows test methods to be executed multiple times |
+| **Context**            | Used for creating repeatable annotations | Used in JUnit for executing tests        |
+| **Application**        | Applied to any element              | Applied only to test methods            |
+| **Container Requirement** | Requires a container annotation    | No container required                    |
+
+### Conclusion
+
+In summary, `@Repeatable` is focused on defining custom annotations that can be applied multiple times, while `@RepeatedTest` is focused on executing a single test method multiple times during testing. They serve distinct roles within the Java programming language and the JUnit testing framework, and understanding their differences is crucial for effectively leveraging annotations and test methodologies in Java applications.
+
+---
+
+In JUnit 5, you can use Java record classes as test classes. Java records are a special kind of class introduced in Java 14 as a preview feature and became a standard feature in Java 16. They are a concise way to create data-carrying classes without having to write boilerplate code like constructors, getters, `toString()`, `hashCode()`, and `equals()`.
+
+### Why Use Records as Test Classes?
+
+Using records as test classes can help you keep your test code clean and focused. Since records are immutable, they provide a clear structure for the data used in your tests. Here’s a detailed explanation along with an example.
+
+### Characteristics of Records
+
+1. **Immutable**: Once created, the fields of a record cannot be changed, ensuring that the test data remains consistent throughout the test lifecycle.
+2. **Compact Syntax**: Records reduce boilerplate code, making your test classes more readable and maintainable.
+3. **Automatic Implementations**: The compiler automatically generates common methods like `equals()`, `hashCode()`, and `toString()`.
+
+### Example of Using a Record as a Test Class
+
+Let’s say we want to test a simple calculator utility that adds two numbers. We can use a record to represent our test cases.
+
+#### Calculator Class
+
+First, we create a simple calculator class with an `add` method.
+
+```java
+package com.dandaev.edu;
+
+public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+}
+```
+
+#### Record for Test Cases
+
+Next, we define a record that will hold our test cases. The record will contain the input values and the expected result.
+
+```java
+package com.dandaev.edu;
+
+public record AdditionTestCase(int a, int b, int expected) {
+}
+```
+
+#### Test Class Using Records
+
+Now we can write a test class that uses the `AdditionTestCase` record to store our test data.
+
+```java
+package com.dandaev.edu;
+
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class CalculatorTest {
+
+    @TestFactory
+    Collection<DynamicTest> dynamicTestsForAddition() {
+        // Create test cases using the record
+        AdditionTestCase[] testCases = {
+                new AdditionTestCase(1, 1, 2),
+                new AdditionTestCase(2, 3, 5),
+                new AdditionTestCase(-1, -1, -2),
+                new AdditionTestCase(100, 200, 300)
+        };
+
+        // Return dynamic tests for each case
+        return Arrays.stream(testCases)
+                .map(testCase -> DynamicTest.dynamicTest(
+                        String.format("Adding %d and %d should equal %d", testCase.a(), testCase.b(), testCase.expected()),
+                        () -> assertEquals(testCase.expected(), new Calculator().add(testCase.a(), testCase.b()))
+                ))
+                .toList();
+    }
+}
+```
+
+### Explanation of the Test Class
+
+1. **Dynamic Tests**:
+   - The `@TestFactory` annotation allows you to create dynamic tests, which are generated at runtime. In this example, we create a collection of dynamic tests based on the `AdditionTestCase` records.
+
+2. **Creating Test Cases**:
+   - We define an array of `AdditionTestCase` records, each holding the two input values and the expected result.
+
+3. **Mapping to Dynamic Tests**:
+   - We use `Arrays.stream()` to convert the array of test cases into a stream, then map each case to a `DynamicTest`.
+   - The `dynamicTest` method takes a display name and a lambda expression that contains the actual test logic, which checks if the result of the addition is as expected.
+
+4. **Assertions**:
+   - Inside the dynamic test, we use `assertEquals` to compare the expected result with the actual result from the `add` method of the `Calculator`.
+
+### Advantages of Using Records in Tests
+
+- **Clarity**: Using records for test cases makes it clear what data is being passed to the tests, enhancing readability.
+- **Immutability**: Since records are immutable, you avoid accidental modifications of test case data, which helps maintain test integrity.
+- **Less Boilerplate**: You don’t need to write additional boilerplate code for getters or constructors, making your tests cleaner.
+
+### Conclusion
+
+Using Java records as test classes in JUnit 5 is a powerful technique that can enhance the organization and clarity of your tests. By leveraging the features of records, you can create more maintainable and expressive test cases, especially when dealing with multiple input scenarios.
+
+---
+
+`RepetitionInfo` — это интерфейс в JUnit 5, который предоставляет дополнительную информацию о текущем повторении при использовании аннотации `@RepeatedTest`. С его помощью можно получить данные о номере текущего выполнения теста и общем количестве повторений, что позволяет писать более гибкие и информативные тесты.
+
+### Где используется
+
+`RepetitionInfo` используется в качестве параметра тестовых методов, которые помечены аннотацией `@RepeatedTest`. Это помогает контролировать и управлять логикой в каждом повторении, основываясь на текущем состоянии.
+
+### Пример
+
+```java
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.RepetitionInfo;
+
+public class RepeatedTestExample {
+
+    @RepeatedTest(5)
+    void testWithRepetitionInfo(RepetitionInfo repetitionInfo) {
+        System.out.println("Execution #" + repetitionInfo.getCurrentRepetition() +
+                           " of " + repetitionInfo.getTotalRepetitions());
+    }
+}
+```
+
+### Объяснение
+
+- `repetitionInfo.getCurrentRepetition()` возвращает номер текущего повторения теста.
+- `repetitionInfo.getTotalRepetitions()` возвращает общее количество повторений.
+
+В данном примере тест будет выполнен 5 раз. На каждом повторении будет выводиться номер текущего выполнения, что полезно для контроля состояния теста на разных этапах.
+
+### Пример применения
+
+`RepetitionInfo` особенно полезен, когда поведение теста зависит от номера повторения. Например, можно использовать разное тестовое состояние на каждом этапе или проводить проверки на определённых итерациях:
+
+```java
+@RepeatedTest(3)
+void testWithConditionsBasedOnRepetition(RepetitionInfo repetitionInfo) {
+    if (repetitionInfo.getCurrentRepetition() == 1) {
+        System.out.println("First iteration-specific setup");
+    } else if (repetitionInfo.getCurrentRepetition() == repetitionInfo.getTotalRepetitions()) {
+        System.out.println("Last iteration-specific cleanup");
+    }
+}
+```
+
+### Зачем нужен `RepetitionInfo`
+
+1. **Гибкость**. Можно управлять логикой теста на каждом повторении.
+2. **Настройка состояния**. Например, настраивать специфическое состояние для определённых повторений.
+3. **Отладка и логгирование**. Удобно выводить номера повторений для отслеживания тестов.
+
+`RepetitionInfo` делает тесты с `@RepeatedTest` более информативными и позволяет создавать вариативные сценарии на каждом этапе выполнения теста.
+
+
+---
+
+
+**Параметризованные тесты** в JUnit 5 позволяют запускать один и тот же тестовый метод с различными наборами данных. Это полезно для проверки одинаковой логики с разными входными данными, что уменьшает дублирование кода и упрощает управление тестами. Параметризованные тесты особенно удобны, когда у вас есть несколько вариантов входных данных и ожидаемых результатов для одной и той же функции.
+
+### Основные компоненты параметризованных тестов
+
+1. **Аннотация `@ParameterizedTest`**: Это аннотация, которая указывает, что метод является параметризованным тестом.
+
+2. **Поставщики данных (Data Providers)**: Это методы, которые возвращают наборы данных для тестирования. Они могут возвращать данные в различных форматах, таких как массивы, списки или потоки (Streams).
+
+### Пример использования параметризованных тестов
+
+Рассмотрим пример, в котором мы тестируем метод сложения.
+
+#### Шаг 1: Определение класса и метода
+
+Создадим класс `Calculator` с методом `add`, который складывает два числа:
+
+```java
+package com.dandaev.edu;
+
+public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+}
+```
+
+#### Шаг 2: Параметризованный тест
+
+Теперь создадим тестовый класс с параметризованным тестом:
+
+```java
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.Arguments;
+
+import java.util.stream.Stream;
+
+public class CalculatorTest {
+
+    @ParameterizedTest
+    @MethodSource("additionProvider")
+    void testAddition(int a, int b, int expected) {
+        Calculator calculator = new Calculator();
+        assertEquals(expected, calculator.add(a, b));
+    }
+
+    static Stream<Arguments> additionProvider() {
+        return Stream.of(
+                Arguments.of(1, 1, 2),         // 1 + 1 = 2
+                Arguments.of(2, 3, 5),         // 2 + 3 = 5
+                Arguments.of(-1, -1, -2),      // -1 + -1 = -2
+                Arguments.of(100, 200, 300)    // 100 + 200 = 300
+        );
+    }
+}
+```
+
+### Как это работает
+
+1. **Аннотация `@ParameterizedTest`**: Указывает, что метод `testAddition` будет запущен несколько раз с различными наборами данных.
+
+2. **Метод `additionProvider`**: Это метод, который возвращает `Stream` с аргументами. Каждый набор аргументов представляет собой входные данные для теста: два числа и ожидаемый результат. Он возвращает объекты `Arguments`, которые содержат данные, передаваемые в тестовый метод.
+
+3. **Метод `assertEquals`**: Внутри `testAddition` мы используем `assertEquals` для проверки, что результат сложения равен ожидаемому значению.
+
+### Другие способы поставки данных
+
+JUnit 5 предлагает несколько других аннотаций для предоставления данных для параметризованных тестов:
+
+1. **`@ValueSource`**: Позволяет передавать простые типы данных (например, строки, числа):
+
+   ```java
+   @ParameterizedTest
+   @ValueSource(ints = {1, 2, 3, 4, 5})
+   void testIsPositive(int number) {
+       assertTrue(number > 0);
+   }
+   ```
+
+2. **`@EnumSource`**: Позволяет передавать значения перечислений (enum):
+
+   ```java
+   enum Color {
+       RED, GREEN, BLUE
+   }
+
+   @ParameterizedTest
+   @EnumSource(Color.class)
+   void testColor(Color color) {
+       assertNotNull(color);
+   }
+   ```
+
+3. **`@CsvSource`**: Позволяет передавать данные в формате CSV:
+
+   ```java
+   @ParameterizedTest
+   @CsvSource({
+       "1, 1, 2",
+       "2, 3, 5",
+       "-1, -1, -2"
+   })
+   void testAdditionCsv(int a, int b, int expected) {
+       assertEquals(expected, new Calculator().add(a, b));
+   }
+   ```
+
+4. **`@MethodSource`**: Как показано ранее, позволяет использовать любой метод, возвращающий поток данных.
+
+### Заключение
+
+Параметризованные тесты в JUnit 5 делают тестирование более гибким и эффективным, позволяя проверять одинаковую логику с различными наборами входных данных. Они помогают уменьшить дублирование кода и упрощают поддержку тестов, делая их более читабельными и понятными. Благодаря различным способам поставки данных, разработчики могут выбрать наиболее подходящий для своих нужд метод.
+
+---
+
+Аннотация `@Tag` в JUnit 5 используется для маркировки тестов и создания групп тестов, которые можно запускать выборочно. Это позволяет организовать тесты по категориям и выбирать только те, которые соответствуют определённым требованиям, например, по сложности, скорости выполнения, компоненту системы и т. д.
+
+### Как работает `@Tag`
+
+Аннотация `@Tag` применяется на уровне класса или метода. Тесты, помеченные определённым тегом, можно запускать отдельно, используя команду запуска с фильтром по тегу, или же исключать определённые теги из запуска.
+
+### Пример использования `@Tag`
+
+```java
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
+public class TagExampleTest {
+
+    @Test
+    @Tag("fast")
+    void fastTest() {
+        System.out.println("This is a fast test.");
+    }
+
+    @Test
+    @Tag("slow")
+    void slowTest() {
+        System.out.println("This is a slow test.");
+    }
+}
+```
+
+В этом примере:
+- `fastTest` помечен тегом `"fast"`.
+- `slowTest` помечен тегом `"slow"`.
+
+### Запуск тестов по тегам
+
+JUnit позволяет запускать тесты с определённым тегом через настройки в инструменте сборки (например, Maven или Gradle) или IDE. Например:
+
+- **Maven**: В `pom.xml` можно добавить профиль для выполнения тестов по тегам:
+
+  ```xml
+  <profiles>
+    <profile>
+      <id>fast-tests</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.0.0-M5</version>
+            <configuration>
+              <groups>fast</groups>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  ```
+
+  Здесь тесты с тегом `fast` будут запускаться через профиль `fast-tests`.
+
+- **Gradle**: В `build.gradle` можно указать фильтр по тегам:
+
+  ```groovy
+  test {
+      useJUnitPlatform {
+          includeTags 'fast'
+          excludeTags 'slow'
+      }
+  }
+  ```
+
+  В этом примере будут запускаться только тесты с тегом `fast`, и тесты с тегом `slow` будут исключены.
+
+### Зачем нужен `@Tag`
+
+- **Фильтрация тестов**. Полезно, когда нужно запускать только подмножество тестов, например, быстрые или специфичные для определённого компонента.
+- **Разделение тестов по категориям**. Можно маркировать тесты по сложности, окружению (`@Tag("integration")`, `@Tag("unit")`), скорости выполнения и другим критериям.
+- **Упрощение CI/CD**. Можно выполнять определённые группы тестов на различных этапах пайплайна, например, быстрые тесты на каждом коммите и интеграционные тесты только при сборке на сервере.
+
+### Дополнительные примеры
+
+```java
+@Tag("database")
+@Tag("integration")
+public class DatabaseIntegrationTest {
+
+    @Test
+    @Tag("critical")
+    void criticalDatabaseTest() {
+        System.out.println("Running a critical database test.");
+    }
+}
+```
+
+В этом примере:
+- Сам класс помечен как `database` и `integration`.
+- Метод `criticalDatabaseTest` имеет дополнительный тег `critical`.
+
+Используя фильтры по тегам, можно выбрать тесты, которые необходимо запускать, что делает аннотацию `@Tag` удобным и гибким инструментом для управления тестами.
+
+---
+
+`TestInfo` и `TestReporter` — это специальные интерфейсы в JUnit 5, которые помогают получить информацию о текущем тесте и передавать дополнительные данные во время тестирования. Их часто используют для логгирования, диагностики и дополнительного анализа.
+
+### `TestInfo`
+
+Интерфейс `TestInfo` предоставляет информацию о тесте, такую как:
+- Имя тестового метода
+- Название тестового класса
+- Аннотации, примененные к тесту (например, `@Tag`, `@DisplayName`)
+
+`TestInfo` можно передать в метод тестирования или в методы жизненного цикла, и тогда JUnit автоматически передаст соответствующую информацию о текущем тесте.
+
+#### Пример использования `TestInfo`
+
+```java
+import org.junit.jupiter.api.*;
+
+@DisplayName("Тесты для класса MyClass")
+class MyClassTest {
+
+    @BeforeEach
+    void init(TestInfo testInfo) {
+        System.out.println("Выполняем " + testInfo.getDisplayName());
+    }
+
+    @Test
+    @DisplayName("Простой тест")
+    @Tag("fast")
+    void simpleTest(TestInfo testInfo) {
+        System.out.println("Метод: " + testInfo.getTestMethod().orElseThrow().getName());
+        System.out.println("Класс: " + testInfo.getTestClass().orElseThrow().getName());
+        System.out.println("Теги: " + testInfo.getTags());
+    }
+}
+```
+
+В этом примере:
+- `@BeforeEach` использует `TestInfo`, чтобы вывести имя текущего теста перед его выполнением.
+- Тестовый метод `simpleTest` также использует `TestInfo`, чтобы вывести метод, класс и теги теста.
+
+### `TestReporter`
+
+Интерфейс `TestReporter` позволяет добавлять в отчет дополнительные сообщения или данные. Это полезно для логгирования промежуточных данных и предоставления дополнительной информации, которая может помочь в диагностике ошибок.
+
+`TestReporter` передается в тестовые методы или методы жизненного цикла, и с его помощью можно выводить пользовательские сообщения, которые будут отображаться в логах тестов.
+
+#### Пример использования `TestReporter`
+
+```java
+import org.junit.jupiter.api.*;
+
+class MyClassTest {
+
+    @Test
+    void reportTest(TestReporter testReporter) {
+        testReporter.publishEntry("Начало теста", "Проверка начальных условий");
+        // Симулируем выполнение теста
+        testReporter.publishEntry("Результат", "Успешно");
+    }
+}
+```
+
+В этом примере:
+- `TestReporter.publishEntry()` используется для публикации пользовательских сообщений. Сообщения отображаются в логах и помогают следить за выполнением теста.
+
+### Основные различия и рекомендации по использованию
+
+- `TestInfo` удобен, когда необходимо получить контекстную информацию о текущем тесте (например, имя метода, класс и теги).
+- `TestReporter` помогает добавлять дополнительные комментарии в отчет, особенно полезно для логгирования.
+
+### Совместное использование `TestInfo` и `TestReporter`
+
+```java
+class CombinedTest {
+
+    @BeforeEach
+    void init(TestInfo testInfo, TestReporter testReporter) {
+        testReporter.publishEntry("Подготовка к тесту", "Выполняем " + testInfo.getDisplayName());
+    }
+
+    @Test
+    @DisplayName("Тест с отчетом")
+    void testWithReporting(TestInfo testInfo, TestReporter testReporter) {
+        testReporter.publishEntry("Запуск теста", testInfo.getTestMethod().orElseThrow().getName());
+        // Симулируем процесс тестирования
+        testReporter.publishEntry("Результат", "Проверка прошла успешно");
+    }
+}
+```
+
+В этом примере:
+- `TestInfo` используется для вывода имени теста.
+- `TestReporter` для логгирования дополнительных сообщений.
+
+`TestInfo` и `TestReporter` делают тестирование более наглядным и помогают лучше понимать выполнение тестов, особенно в больших проектах с множеством тестов.

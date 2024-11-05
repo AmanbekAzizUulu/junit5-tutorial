@@ -16,10 +16,14 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.Arguments;
+
 // @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MathUtilsTest {
-	private Person person_to_test;
 	private MathUtils mathUtils_to_test;
 	private static int counter = 0;
 
@@ -145,14 +149,5 @@ public class MathUtilsTest {
         );
     }
 
-	@Test
-	void testComplexAssertions() {
-		assertAll("Testing person properties",
-			() -> assertAll("Testing name",
-				() -> assertEquals("John", person_to_test.getFirstName(), "First name check failed"),
-				() -> assertEquals("Doe", person_to_test.getLastName(), "Last name check failed")
-			),
-			() -> assertEquals(30, person_to_test.getAge(), "Age check failed")
-		);
-	}
+
 }
