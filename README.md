@@ -1560,3 +1560,431 @@ With `@Disabled` applied to the class, **all tests in `CalculatorTest`** are ski
 
 - **Document the Reason**: Always specify why a test is disabled.
 - **Review Disabled Tests Regularly**: Regularly review and remove `@Disabled` annotations once the underlying issues are resolved, to ensure that your test suite remains comprehensive.
+
+---
+
+In JUnit 5, `@assertAll` is used to group multiple assertions together, allowing them all to execute even if one or more assertions fail. This way, you can check multiple conditions or outcomes in a single test method without stopping at the first failure, which provides a more comprehensive view of the test results.
+
+### Usage of `assertAll`
+
+`assertAll` accepts a collection of executable assertions, allowing you to validate multiple aspects within the same test case. If any of the assertions fail, JUnit will report all failures instead of stopping after the first one.
+
+### Basic Syntax
+
+```java
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
+class MathUtilsTest {
+
+    @Test
+    void testMultipleAssertions() {
+        MathUtils mathUtils = new MathUtils();
+
+        assertAll("Testing multiple assertions",
+            () -> assertEquals(4, mathUtils.adder(2, 2), "Adder test failed"),
+            () -> assertEquals(0, mathUtils.subtractor(2, 2), "Subtractor test failed"),
+            () -> assertEquals(1, mathUtils.divider(2, 2), "Divider test failed")
+        );
+    }
+}
+```
+
+### How It Works
+
+In this example, three assertions are checked:
+1. `adder` result
+2. `subtractor` result
+3. `divider` result
+
+If any of these assertions fail, `assertAll` will report all of the failures together, rather than stopping after the first. This helps you spot multiple issues in a single test run.
+
+### Nested `assertAll` for Complex Structures
+
+If you have complex objects with multiple properties, you can nest `assertAll` calls to check each part of an object.
+
+```java
+@Test
+void testComplexAssertions() {
+    assertAll("Testing person properties",
+        () -> assertAll("Testing name",
+            () -> assertEquals("John", person.getFirstName(), "First name check failed"),
+            () -> assertEquals("Doe", person.getLastName(), "Last name check failed")
+        ),
+        () -> assertEquals(30, person.getAge(), "Age check failed")
+    );
+}
+```
+
+### Key Benefits
+- **Comprehensive feedback**: Reports all assertion failures within the block.
+- **Efficient debugging**: Allows you to quickly identify all issues without rerunning tests multiple times.
+
+### Best Use Cases
+Use `assertAll` when:
+- Validating multiple properties of an object.
+- Checking different outcomes or conditions within a single test.
+- You want to ensure all assertions are evaluated even if some fail.
+
+---
+
+In JUnit, **lifecycle methods** are special methods within a test class that execute at specific points in the test execution process. These methods are annotated with `@BeforeAll`, `@AfterAll`, `@BeforeEach`, or `@AfterEach`, and they allow you to manage setup and cleanup tasks that are needed for testing. Each of these annotations has a specific purpose and scope, which allows you to control the lifecycle and execution of your tests in a precise way.
+
+Here's a breakdown of each lifecycle annotation:
+
+---
+
+### 1. `@BeforeAll`
+- **Purpose**: Executes once before any test methods in the class run.
+- **Scope**: Runs at the class level, applying to all test methods.
+- **Common Usage**: Often used for expensive or resource-heavy setup that only needs to happen once, such as connecting to a database, setting up a server, or loading large files.
+- **Requirements**:
+  - The method must be `static` in JUnit 5, unless the test class is annotated with `@TestInstance(TestInstance.Lifecycle.PER_CLASS)`.
+  - The method should ideally be `void` and public.
+
+#### Example:
+```java
+@BeforeAll
+static void initAll() {
+    System.out.println("Setting up resources for all tests");
+    // Perform setup that applies to all tests, e.g., establishing a database connection
+}
+```
+
+### 2. `@AfterAll`
+- **Purpose**: Executes once after all test methods in the class have run.
+- **Scope**: Runs at the class level, applying to all test methods.
+- **Common Usage**: Used for cleaning up resources that were initialized in `@BeforeAll`, such as closing database connections, stopping servers, or freeing resources.
+- **Requirements**:
+  - Like `@BeforeAll`, it should be a `static` method in JUnit 5 unless `@TestInstance(TestInstance.Lifecycle.PER_CLASS)` is used.
+  - The method should ideally be `void` and public.
+
+#### Example:
+```java
+@AfterAll
+static void tearDownAll() {
+    System.out.println("Cleaning up resources after all tests");
+    // Perform cleanup for resources created in @BeforeAll
+}
+```
+
+---
+
+### 3. `@BeforeEach`
+- **Purpose**: Executes before each test method runs.
+- **Scope**: Runs once per test method, resetting the test environment for each test.
+- **Common Usage**: Useful for setting up data or objects that are needed by each test, ensuring that each test has a fresh and independent setup. This could include resetting variables, initializing objects, or creating test-specific data.
+- **Requirements**: Does not need to be static. The method should ideally be `void`.
+
+#### Example:
+```java
+@BeforeEach
+void init() {
+    System.out.println("Setting up for each test");
+    // Prepare any data or objects that each test might need
+}
+```
+
+---
+
+### 4. `@AfterEach`
+- **Purpose**: Executes after each test method completes.
+- **Scope**: Runs once per test method, following its completion.
+- **Common Usage**: Commonly used for cleaning up or resetting any resources or data used in each test. This ensures that each test starts with a clean slate.
+- **Requirements**: Does not need to be static. The method should ideally be `void`.
+
+#### Example:
+```java
+@AfterEach
+void tearDown() {
+    System.out.println("Cleaning up after each test");
+    // Cleanup tasks to reset the environment for the next test
+}
+```
+
+---
+
+### How Lifecycle Methods Work Together
+When a JUnit test class is executed, JUnit follows a sequence of method calls that incorporate these lifecycle methods:
+
+1. **`@BeforeAll`** is executed once at the very beginning, before any tests.
+2. For each test:
+   - **`@BeforeEach`** is run before the test to set up a fresh environment.
+   - The test method is executed.
+   - **`@AfterEach`** is run after the test to clean up.
+3. **`@AfterAll`** is executed once at the end, after all tests have finished.
+
+### Example of All Lifecycle Methods in One Class
+
+```java
+import org.junit.jupiter.api.*;
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class ExampleTest {
+
+    @BeforeAll
+    static void setupAll() {
+        System.out.println("Setting up for all tests");
+    }
+
+    @BeforeEach
+    void setupEach() {
+        System.out.println("Setting up for a test");
+    }
+
+    @Test
+    void testOne() {
+        System.out.println("Running Test 1");
+        Assertions.assertTrue(true);
+    }
+
+    @Test
+    void testTwo() {
+        System.out.println("Running Test 2");
+        Assertions.assertTrue(true);
+    }
+
+    @AfterEach
+    void cleanupEach() {
+        System.out.println("Cleaning up after a test");
+    }
+
+    @AfterAll
+    static void cleanupAll() {
+        System.out.println("Cleaning up after all tests");
+    }
+}
+```
+
+### Output of the Example
+
+Running the above example would produce output like this:
+```
+Setting up for all tests
+Setting up for a test
+Running Test 1
+Cleaning up after a test
+Setting up for a test
+Running Test 2
+Cleaning up after a test
+Cleaning up after all tests
+```
+
+---
+
+### Key Points to Remember
+- **`@BeforeAll` and `@AfterAll`** are class-level setup and teardown methods, while **`@BeforeEach` and `@AfterEach`** are instance-level, executing before and after each test method.
+- Using `@TestInstance(TestInstance.Lifecycle.PER_CLASS)` allows `@BeforeAll` and `@AfterAll` to be non-static in JUnit 5, enabling the sharing of class state between methods.
+- These lifecycle methods ensure a controlled and repeatable test environment, reducing the chance of "test pollution" where one test might interfere with another due to shared resources or state.
+
+---
+
+In JUnit, a **Test Class** serves as the main container for organizing and executing test methods. Test classes are classes that contain at least one test method, meaning any method annotated with `@Test` or other test-specific annotations like `@RepeatedTest`, `@ParameterizedTest`, etc. These test methods contain the logic to verify that a specific part of the code under test behaves as expected.
+
+Here’s a detailed look at the properties, requirements, and types of test classes in JUnit:
+
+---
+
+### 1. Types of Test Classes
+A test class can be:
+- **Top-Level Class**: A standard public class defined in its own file.
+- **Static Member Class**: A `static` nested class within another class, often used to organize related tests under one main class.
+- **@Nested Class**: An inner class annotated with `@Nested`, allowing it to group tests in a hierarchical structure within the outer class.
+
+### 2. Requirements for a Test Class
+JUnit imposes certain requirements on test classes to ensure they function properly within the JUnit testing framework:
+   - **Not Abstract**: Test classes cannot be `abstract` because JUnit needs to instantiate them to run their test methods.
+   - **Single Constructor**: Test classes should have a single, parameterless constructor (or a record-based constructor if it's a Java record). This helps JUnit manage the lifecycle of the test class instances.
+   - **Method Annotations**: A test class should contain at least one method annotated with `@Test` or other JUnit test annotations like `@ParameterizedTest`, `@RepeatedTest`, or `@TestFactory`.
+
+### 3. Structure of a Typical Test Class
+A well-organized test class typically includes:
+   - **Setup Methods**: Methods annotated with `@BeforeEach` and `@BeforeAll` to set up preconditions for tests.
+   - **Test Methods**: Methods annotated with `@Test` that contain assertions to verify the behavior of the code under test.
+   - **Teardown Methods**: Methods annotated with `@AfterEach` and `@AfterAll` to clean up after tests.
+
+### 4. Using @Nested Classes
+JUnit allows for nested test classes with the `@Nested` annotation. These can be especially useful to:
+   - **Group Related Tests**: Organize tests related to specific aspects of the functionality under a single outer test class.
+   - **Control Test Lifecycles**: Each `@Nested` class can have its own setup and teardown methods, enabling more precise control over the environment for specific groups of tests.
+   - **Improving Readability**: `@Nested` classes help structure complex tests, making them more readable and organized.
+
+#### Example
+```java
+import org.junit.jupiter.api.*;
+
+public class ExampleTest {
+
+    @BeforeAll
+    static void setupAll() {
+        System.out.println("Setting up resources for all tests");
+    }
+
+    @BeforeEach
+    void setup() {
+        System.out.println("Setting up before each test");
+    }
+
+    @Test
+    void testMethod1() {
+        System.out.println("Running testMethod1");
+        Assertions.assertTrue(true);
+    }
+
+    @Nested
+    class NestedTestClass {
+
+        @BeforeEach
+        void setupNested() {
+            System.out.println("Setup for each test in NestedTestClass");
+        }
+
+        @Test
+        void testMethodInNested() {
+            System.out.println("Running testMethodInNested");
+            Assertions.assertTrue(true);
+        }
+
+        @AfterEach
+        void tearDownNested() {
+            System.out.println("Teardown for each test in NestedTestClass");
+        }
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.out.println("Cleaning up after each test");
+    }
+
+    @AfterAll
+    static void cleanupAll() {
+        System.out.println("Cleaning up resources after all tests");
+    }
+}
+```
+
+### Output of the Example
+```
+Setting up resources for all tests
+Setting up before each test
+Running testMethod1
+Cleaning up after each test
+Setup for each test in NestedTestClass
+Running testMethodInNested
+Teardown for each test in NestedTestClass
+Cleaning up after each test
+Cleaning up resources after all tests
+```
+
+In this example:
+- **`ExampleTest`** is a top-level test class containing a test method `testMethod1`.
+- **`NestedTestClass`** is an inner class annotated with `@Nested`. It has its own setup and teardown methods (`setupNested` and `tearDownNested`), which run before and after each test within the nested class.
+- Each nested class can access the setup of the outer class, enabling hierarchical organization without sacrificing independence between tests.
+
+---
+
+### 5. Java Record Classes as Test Classes
+JUnit 5 supports test classes as **Java records**. Records can serve as test classes if they:
+   - Have a primary constructor (as required by Java’s record syntax).
+   - Are non-abstract.
+
+Using records in this way is rare and typically reserved for scenarios where immutability and specific structured data storage in the test setup are desired.
+
+---
+
+### Benefits of Test Classes
+Using test classes allows you to:
+- **Isolate and Organize Tests**: Group related test methods, making it easier to manage test logic and isolate functionality.
+- **Control Test Lifecycle**: Use lifecycle methods like `@BeforeEach` and `@AfterEach` to manage setup and teardown at both the class and method levels.
+- **Use Nested Classes for Grouping**: With `@Nested`, you can group related tests within a single class, reducing clutter and improving readability.
+
+### Summary
+A test class is essentially a container for one or more test methods and lifecycle methods, providing a structured environment to verify code behavior. Using top-level, static, and nested classes in JUnit enables well-organized, maintainable tests that can be flexibly managed within their own isolated contexts, supporting effective and comprehensive test coverage.
+
+
+---
+
+In JUnit, a **Test Method** is an instance method that serves as a core unit of testing, containing assertions to verify specific behaviors or outcomes of the code under test. A test method is directly annotated with `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory`, or `@TestTemplate`, each serving different purposes and enabling a variety of testing approaches.
+
+Here’s a more detailed look at each of these annotations:
+
+---
+
+### 1. `@Test`
+- **Purpose**: Marks a method as a standard test case.
+- **Usage**: Simple test method that executes assertions to check for expected results.
+- **Example**:
+  ```java
+  @Test
+  void additionTest() {
+      assertEquals(5, MathUtils.add(2, 3));
+  }
+  ```
+  This method checks if the `add` method in `MathUtils` correctly sums 2 and 3.
+
+### 2. `@RepeatedTest`
+- **Purpose**: Repeats a test multiple times, useful for testing reliability or performance over repeated runs.
+- **Parameters**: Specifies the number of repetitions.
+- **Example**:
+  ```java
+  @RepeatedTest(5)
+  void repeatedAdditionTest() {
+      assertEquals(5, MathUtils.add(2, 3));
+  }
+  ```
+  This method will run the test 5 times to verify that the addition consistently works as expected.
+
+### 3. `@ParameterizedTest`
+- **Purpose**: Runs the same test method multiple times with different input values, which is useful for testing functions with a range of inputs.
+- **Parameters**: Requires a source of arguments, such as `@ValueSource`, `@CsvSource`, `@MethodSource`, etc.
+- **Example**:
+  ```java
+  @ParameterizedTest
+  @ValueSource(ints = {1, 2, 3, 4, 5})
+  void testSquareOfNumbers(int number) {
+      assertTrue(MathUtils.square(number) >= 0);
+  }
+  ```
+  This method tests that the square of any number from the provided list is non-negative.
+
+### 4. `@TestFactory`
+- **Purpose**: Used to create **Dynamic Tests** that are generated at runtime instead of being defined statically. This is useful for cases where the number of tests isn’t fixed, such as when generating tests based on data.
+- **Returns**: A collection or stream of dynamic test instances, such as `DynamicTest`.
+- **Example**:
+  ```java
+  @TestFactory
+  Collection<DynamicTest> dynamicTestsWithEvenNumbers() {
+      return Arrays.asList(
+          DynamicTest.dynamicTest("2 is even", () -> assertTrue(MathUtils.isEven(2))),
+          DynamicTest.dynamicTest("4 is even", () -> assertTrue(MathUtils.isEven(4)))
+      );
+  }
+  ```
+  This method dynamically generates tests to check whether numbers are even.
+
+### 5. `@TestTemplate`
+- **Purpose**: Defines a method as a template for multiple test invocations with different configurations, usually working in combination with custom `TestTemplateInvocationContextProviders`.
+- **Example Use Case**: Often used for testing custom configurations or environments that require special setup for each test run.
+- **Example**:
+  ```java
+  @TestTemplate
+  @ExtendWith(CustomInvocationContextProvider.class)
+  void testWithCustomContext() {
+      // custom test logic
+  }
+  ```
+
+---
+
+### Organizing Test Methods in the Test Tree
+Each of these annotations impacts the **test tree** (the hierarchical structure of test execution and reporting) in different ways:
+- **`@Test`**: Each `@Test` method appears as an individual test node in the test tree.
+- **`@RepeatedTest`**: Shows as a container node grouping each repetition as a child.
+- **`@ParameterizedTest`**: Creates a container node, with each parameterized execution as a child node.
+- **`@TestFactory`**: Appears as a container in the test tree, with each dynamically created test as a child node.
+- **`@TestTemplate`**: Custom-defined with specific contexts, often displayed as a container when multiple invocations are used.
+
+### Summary
+A **Test Method** is the fundamental building block of testing in JUnit. By using different annotations, JUnit allows you to test functions thoroughly, with flexibility in the data, repetitions, and even custom contexts.

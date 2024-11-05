@@ -19,7 +19,8 @@ import org.junit.jupiter.api.condition.OS;
 // @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MathUtilsTest {
-	private MathUtils instance_to_test;
+	private Person person_to_test;
+	private MathUtils mathUtils_to_test;
 	private static int counter = 0;
 
 	@BeforeAll
@@ -44,7 +45,7 @@ public class MathUtilsTest {
 
 	@BeforeEach
 	void init() {
-		instance_to_test = new MathUtils(); // инициализация объекта тестирования
+		mathUtils_to_test = new MathUtils(); // инициализация объекта тестирования
 		System.out.println(++ counter + " — Initializing of test instance ....");
 		try {
 			Thread.sleep(500);
@@ -95,19 +96,19 @@ public class MathUtilsTest {
 	@Disabled
 	@DisplayName("Testing adder() method")
 	void testingAdderMethod() {
-		assertEquals(instance_to_test.adder(2, 3), 5, "sum of 2 and 3 should be 5");
+		assertEquals(mathUtils_to_test.adder(2, 3), 5, "sum of 2 and 3 should be 5");
 	}
 
 	@Test
 	@DisplayName("Testing subtractor() method")
 	void testingSubtractorMethod() {
-		assertEquals(instance_to_test.subtractor(3, 2), 1, "the result of subtraction should be 1");
+		assertEquals(mathUtils_to_test.subtractor(3, 2), 1, "the result of subtraction should be 1");
 	}
 
 	@Test
 	@DisplayName("Testing circleArea() method")
 	void testingComputationOfCircleArea() {
-		assertEquals(instance_to_test.circleArea(10), 314.1592653589793);
+		assertEquals(mathUtils_to_test.circleArea(10), 314.1592653589793);
 	}
 
 	@Test
@@ -115,7 +116,7 @@ public class MathUtilsTest {
 	@DisplayName("Testing divider() method")
 	void testingDividerMethod() {
 		// если будет выброшен ArithmeticException, тест будет пройден успешно
-		assertThrows(ArithmeticException.class, () -> instance_to_test.divider(10, 0),"divide by zero should throw ArithmeticException");
+		assertThrows(ArithmeticException.class, () -> mathUtils_to_test.divider(10, 0),"divide by zero should throw ArithmeticException");
 
 		// если же не будет выброшен ArithmeticException, или будет выброшен Exception отличный от ArithmeticException, тест будет пройден нуспешно
 		// assertThrows(ArithmeticException.class, () -> instance_to_test.divider(10, 2), "divide by zero should throw ArithmeticException");
@@ -132,4 +133,26 @@ public class MathUtilsTest {
     void runOnlyOnProdEnvironment() {
         // This test only runs if the ENV environment variable is set to "PROD"
     }
+
+	@Test
+    void testMultipleAssertions() {
+        MathUtils mathUtils = new MathUtils();
+
+        assertAll("Testing multiple assertions",
+            () -> assertEquals(4, mathUtils.adder(2, 2), "Adder test failed"),
+            () -> assertEquals(0, mathUtils.subtractor(2, 2), "Subtractor test failed"),
+            () -> assertEquals(1, mathUtils.divider(2, 2), "Divider test failed")
+        );
+    }
+
+	@Test
+	void testComplexAssertions() {
+		assertAll("Testing person properties",
+			() -> assertAll("Testing name",
+				() -> assertEquals("John", person_to_test.getFirstName(), "First name check failed"),
+				() -> assertEquals("Doe", person_to_test.getLastName(), "Last name check failed")
+			),
+			() -> assertEquals(30, person_to_test.getAge(), "Age check failed")
+		);
+	}
 }
