@@ -18,6 +18,4 @@ public class MathUtils {
 	public int divider(int a, int b) {
 		return a / b;
 	}
-
-
 }
