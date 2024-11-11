@@ -3184,3 +3184,172 @@ public class MyTest {
 - **`@TestReporter`** полезен для добавления пользовательских сообщений или данных, которые должны быть включены в отчеты, что упрощает анализ результатов тестов.
 
 Эти аннотации помогают улучшить понимание и прозрачность тестов, особенно при использовании CI/CD для мониторинга и отладки.
+
+---
+
+В JUnit 5 можно использовать параметризованные тесты, чтобы выполнить тест с разными наборами данных, избегая дублирования кода. Параметризованные тесты позволяют запускать тестовый метод несколько раз с разными аргументами, что полезно для проверки различных условий и сценариев.
+
+### Основные аннотации для поставки данных
+JUnit 5 предоставляет несколько аннотаций, чтобы задать параметры для тестов. Вот основные из них:
+
+1. **@ValueSource**: Подаёт простые значения, такие как массив строк, целых чисел, логических значений и т.д.
+2. **@EnumSource**: Используется для передачи значений перечислений (`enum`).
+3. **@CsvSource**: Позволяет передавать строки в формате CSV.
+4. **@CsvFileSource**: Загружает данные из CSV-файла.
+5. **@MethodSource**: Использует метод для поставки аргументов.
+6. **@ArgumentsSource**: Предоставляет возможность использовать пользовательский источник аргументов.
+
+### Примеры использования
+
+#### 1. `@ValueSource`
+Эта аннотация позволяет передавать массив простых значений, таких как `int`, `String`, `double` и `boolean`.
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class ValueSourceExample {
+
+    @ParameterizedTest
+    @ValueSource(strings = {"hello", "world", "JUnit"})
+    void testWithStringValueSource(String word) {
+        assertTrue(word.length() > 3);
+    }
+}
+```
+
+В данном примере тест выполнится 3 раза с разными значениями строки.
+
+#### 2. `@EnumSource`
+Используется для передачи значений из `enum`. Можно указать конкретные значения, которые будут переданы в тест.
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+public class EnumSourceExample {
+
+    enum Status {
+        ACTIVE, INACTIVE, DELETED
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Status.class, names = {"ACTIVE", "INACTIVE"})
+    void testWithEnumSource(Status status) {
+        assertNotNull(status);
+    }
+}
+```
+
+Здесь тест выполнится дважды, для значений `ACTIVE` и `INACTIVE`.
+
+#### 3. `@CsvSource`
+Эта аннотация позволяет передавать наборы данных в формате CSV.
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class CsvSourceExample {
+
+    @ParameterizedTest
+    @CsvSource({
+        "test, 4",
+        "JUnit, 5",
+        "param, 5"
+    })
+    void testWithCsvSource(String word, int length) {
+        assertEquals(length, word.length());
+    }
+}
+```
+
+Тест выполнится три раза с указанными значениями.
+
+#### 4. `@CsvFileSource`
+Загружает данные из CSV-файла, который находится в ресурсах.
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class CsvFileSourceExample {
+
+    @ParameterizedTest
+    @CsvFileSource(resources = "/test-data.csv", numLinesToSkip = 1)
+    void testWithCsvFileSource(String word, int length) {
+        assertEquals(length, word.length());
+    }
+}
+```
+
+Параметр `numLinesToSkip` используется для пропуска заголовков.
+
+#### 5. `@MethodSource`
+Эта аннотация позволяет использовать метод в качестве источника данных. Метод должен возвращать поток (`Stream`), список (`List`), коллекцию (`Collection`) или массив.
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import java.util.stream.Stream;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class MethodSourceExample {
+
+    static Stream<String> stringProvider() {
+        return Stream.of("apple", "banana", "cherry");
+    }
+
+    @ParameterizedTest
+    @MethodSource("stringProvider")
+    void testWithMethodSource(String word) {
+        assertTrue(word.length() > 3);
+    }
+}
+```
+
+Тест выполнится для каждого значения, возвращенного методом `stringProvider`.
+
+#### 6. `@ArgumentsSource`
+Эта аннотация предоставляет возможность использовать пользовательский источник аргументов, реализуя интерфейс `ArgumentsProvider`.
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import java.util.stream.Stream;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+public class ArgumentsSourceExample {
+
+    static class CustomArgumentsProvider implements ArgumentsProvider {
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+            return Stream.of(
+                Arguments.of("apple", 5),
+                Arguments.of("banana", 6)
+            );
+        }
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(CustomArgumentsProvider.class)
+    void testWithArgumentsSource(String word, int length) {
+        assertNotNull(word);
+        assertEquals(length, word.length());
+    }
+}
+```
+
+### Преимущества параметризованных тестов
+- **Повышают читабельность кода** за счёт отсутствия дублирования.
+- **Уменьшают количество тестовых методов**, поскольку один тест можно выполнить с разными данными.
+- **Облегчают поддержку кода**, так как изменение в одном тесте будет применено ко всем наборам данных.
+
+Эти аннотации позволяют гибко использовать разнообразные данные, что делает тесты более мощными и легкими для понимания.
