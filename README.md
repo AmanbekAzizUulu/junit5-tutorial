@@ -3083,3 +3083,104 @@ class CombinedTest {
 - `TestReporter` для логгирования дополнительных сообщений.
 
 `TestInfo` и `TestReporter` делают тестирование более наглядным и помогают лучше понимать выполнение тестов, особенно в больших проектах с множеством тестов.
+
+---
+
+`@TestInfo` и `@TestReporter` — это аннотации в JUnit 5, которые предоставляют дополнительные возможности для работы с тестовой информацией и отчетностью в ходе выполнения тестов.
+
+### 1. `@TestInfo`
+Аннотация `@TestInfo` позволяет получать сведения о текущем тесте, такие как его имя, теги, имя класса, и имя метода. Она особенно полезна, когда нужно логировать или проверять дополнительную информацию о тесте в процессе его выполнения. `TestInfo` используется как параметр метода, и JUnit автоматически передаёт его, когда тест запускается.
+
+#### Пример использования `@TestInfo`
+```java
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class MyTest {
+
+    @Test
+    void sampleTest(TestInfo testInfo) {
+        System.out.println("Running test: " + testInfo.getDisplayName());
+        System.out.println("Tags: " + testInfo.getTags());
+
+        // Пример использования TestInfo в проверке
+        assertTrue(testInfo.getDisplayName().contains("sample"));
+    }
+}
+```
+
+#### Методы `TestInfo`
+- **`getDisplayName()`** — возвращает имя теста. По умолчанию это имя метода, но оно может быть изменено с помощью аннотации `@DisplayName`.
+- **`getTags()`** — возвращает набор тегов, которые были присвоены тесту (например, с помощью аннотации `@Tag`).
+- **`getTestClass()`** — возвращает объект класса, в котором находится текущий тест.
+- **`getTestMethod()`** — возвращает объект метода, представляющий текущий тест.
+
+### 2. `@TestReporter`
+Аннотация `@TestReporter` используется для создания отчетов и добавления пользовательской информации в отчет о выполнении теста. В отличие от простого вывода в консоль, `TestReporter` предоставляет способ структурированного вывода сообщений и ключ-значение данных, которые могут быть полезны для отладки и анализа тестов.
+
+#### Пример использования `@TestReporter`
+```java
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class MyTest {
+
+    @Test
+    void reportTest(TestReporter testReporter) {
+        // Простое сообщение
+        testReporter.publishEntry("Running test reportTest");
+
+        // Сообщение с несколькими параметрами в формате ключ-значение
+        Map<String, String> data = new HashMap<>();
+        data.put("user", "john.doe");
+        data.put("operation", "database update");
+        testReporter.publishEntry(data);
+    }
+}
+```
+
+#### Методы `TestReporter`
+- **`publishEntry(String message)`** — записывает сообщение в отчет теста. Обычно используется для простых уведомлений или логов.
+- **`publishEntry(String key, String value)`** — записывает сообщение в виде пары ключ-значение.
+- **`publishEntry(Map<String, String> entries)`** — записывает несколько пар ключ-значение одновременно.
+
+### Применение `@TestInfo` и `@TestReporter` вместе
+Эти аннотации можно комбинировать, чтобы не только передавать данные о тесте, но и создавать информативные отчеты.
+
+```java
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.TestReporter;
+
+import java.util.Map;
+
+public class MyTest {
+
+    @Test
+    void combinedTest(TestInfo testInfo, TestReporter testReporter) {
+        // Вывод информации о тесте
+        String testName = testInfo.getDisplayName();
+        testReporter.publishEntry("Starting test", testName);
+
+        // Логирование информации о тесте в отчет
+        Map<String, String> reportData = Map.of(
+            "class", testInfo.getTestClass().orElse(null).getSimpleName(),
+            "method", testInfo.getTestMethod().orElse(null).getName()
+        );
+        testReporter.publishEntry(reportData);
+
+        // Проверка и логика теста...
+    }
+}
+```
+
+### Когда использовать `@TestInfo` и `@TestReporter`
+- **`@TestInfo`** полезен для тестов, которые требуют информации о самом тесте, чтобы проверять или логировать её (например, имя теста, теги).
+- **`@TestReporter`** полезен для добавления пользовательских сообщений или данных, которые должны быть включены в отчеты, что упрощает анализ результатов тестов.
+
+Эти аннотации помогают улучшить понимание и прозрачность тестов, особенно при использовании CI/CD для мониторинга и отладки.
